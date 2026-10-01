@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="theme-color" content="#f7f7f6" />
+    <link rel="icon" href="./icone.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icone-192.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>dispositions-constructives — ancrages et recouvrements, EN 1992-1-1 §8</title>
+  </head>
+  <body>
+    <nav class="barre" aria-label="suite d'outils">
+      <div class="barre-corps">
+        <span class="barre-nom">Aedificium &middot; Beton arme</span>
+        <a class="barre-lien" href="https://henri421.github.io/WebAedificium/" target="_blank" rel="noopener">Suite Aedificium &#8599;</a>
+      </div>
+    </nav>
+
+    <header>
+      <h1>dispositions-constructives</h1>
+      <p class="sous-titre">
+        Longueurs d'ancrage et de recouvrement des armatures, armatures de couture, paquets de barres, mandrins et
+        ancrage des cadres — EN 1992-1-1:2004, §8. Valeurs recommandees, sans annexe nationale.
+      </p>
+      <p class="avertissement">
+        Aide au calcul : l'outil constate, il ne prescrit pas. Il rend des longueurs, jamais un plan de ferraillage.
+        Les conditions d'adherence ne sont jamais supposees : declarez-les ou donnez la position de coulage.
+      </p>
+    </header>
+
+    <main>
+      <section id="saisie" aria-label="saisie">
+        <form id="formulaire" autocomplete="off">
+          <fieldset>
+            <legend>Objet</legend>
+            <label><span>Calcul</span>
+              <select data-champ="mode">
+                <option value="ancrage">ancrage (§8.4)</option>
+                <option value="recouvrement">recouvrement (§8.7)</option>
+              </select>
+            </label>
+            <label><span>Sollicitation</span>
+              <select data-champ="sollicitation">
+                <option value="traction">traction</option>
+                <option value="compression">compression</option>
+              </select>
+            </label>
+            <label><span>Longueur disponible (mm), facultative</span><input type="text" inputmode="decimal" data-champ="disponible" placeholder="constat seul" /></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Barre et materiaux</legend>
+            <label><span>&phi; (mm)</span><input type="text" inputmode="decimal" data-champ="phi" /></label>
+            <label class="case"><input type="checkbox" data-champ="paquet" /><span>paquet de barres (§8.9)</span></label>
+            <div class="groupe" data-groupe="paquet">
+              <label><span>n<sub>b</sub> (-)</span><input type="text" inputmode="decimal" data-champ="nb" /></label>
+              <label class="case"><input type="checkbox" data-champ="verticales" /><span>barres verticales comprimees</span></label>
+            </div>
+            <label><span>f<sub>ck</sub> (MPa)</span><input type="text" inputmode="decimal" data-champ="fck" /></label>
+            <label><span>f<sub>yk</sub> (MPa)</span><input type="text" inputmode="decimal" data-champ="fyk" /></label>
+            <label><span>&sigma;<sub>sd</sub> a l'origine</span>
+              <select data-champ="sig_mode">
+                <option value="f_yd">f_yd (conservatif)</option>
+                <option value="saisie">saisie</option>
+                <option value="reduite">f_yd A_s,req / A_s,prov</option>
+              </select>
+            </label>
+            <div class="groupe" data-groupe="sig-saisie">
+              <label><span>&sigma;<sub>sd</sub> (MPa)</span><input type="text" inputmode="decimal" data-champ="sigma" /></label>
+            </div>
+            <div class="groupe" data-groupe="sig-reduite">
+              <label><span>A<sub>s,req</sub> (mm&sup2;)</span><input type="text" inputmode="decimal" data-champ="as_req" /></label>
+              <label><span>A<sub>s,prov</sub> (mm&sup2;)</span><input type="text" inputmode="decimal" data-champ="as_prov" /></label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Adherence (figure 8.2)</legend>
+            <label><span>Conditions</span>
+              <select data-champ="adh_mode">
+                <option value="declarees">declarees</option>
+                <option value="geometrie">deduites de la position de coulage</option>
+              </select>
+            </label>
+            <div class="groupe" data-groupe="adh-declarees">
+              <label><span>Conditions d'adherence</span>
+                <select data-champ="conditions">
+                  <option value="mauvaises">mauvaises (&eta;1 = 0,7)</option>
+                  <option value="bonnes">bonnes (&eta;1 = 1,0)</option>
+                </select>
+              </label>
+            </div>
+            <div class="groupe" data-groupe="adh-geometrie">
+              <label><span>Inclinaison de la barre (&deg;)</span><input type="text" inputmode="decimal" data-champ="inclinaison" /></label>
+              <label><span>Hauteur coulee h (mm)</span><input type="text" inputmode="decimal" data-champ="h_element" /></label>
+              <label><span>Distance de la barre au fond (mm)</span><input type="text" inputmode="decimal" data-champ="z_fond" /></label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Extremite et enrobage (figure 8.3)</legend>
+            <label><span>Forme</span>
+              <select data-champ="forme">
+                <option value="droite">droite</option>
+                <option value="coude-ou-crochet">coude ou crochet</option>
+                <option value="boucle">boucle</option>
+              </select>
+            </label>
+            <label><span>a, distance libre entre barres (mm)</span><input type="text" inputmode="decimal" data-champ="a" /></label>
+            <label><span>c<sub>1</sub>, enrobage lateral (mm)</span><input type="text" inputmode="decimal" data-champ="c1" /></label>
+            <label><span>c, enrobage de fond (mm)</span><input type="text" inputmode="decimal" data-champ="c" /></label>
+            <div class="groupe" data-groupe="methode">
+              <label><span>Methode</span>
+                <select data-champ="methode">
+                  <option value="generale">generale §8.4.4(1)</option>
+                  <option value="simplifiee">l_b,eq simplifiee §8.4.4(2)</option>
+                </select>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Confinement</legend>
+            <label class="case"><input type="checkbox" data-champ="confinement" /><span>armatures transversales non soudees</span></label>
+            <div class="groupe" data-groupe="confinement">
+              <label><span>Element</span>
+                <select data-champ="type_element">
+                  <option value="poutre">poutre (A_st,min = 0,25 A_s)</option>
+                  <option value="dalle">dalle (A_st,min = 0)</option>
+                </select>
+              </label>
+              <label><span>&Sigma;A<sub>st</sub> le long de l<sub>bd</sub> (mm&sup2;)</span><input type="text" inputmode="decimal" data-champ="somme_ast" /></label>
+              <label><span>Position (figure 8.4)</span>
+                <select data-champ="position">
+                  <option value="angle">barre dans l'angle (K = 0,1)</option>
+                  <option value="courant">le long d'un brin (K = 0,05)</option>
+                  <option value="exterieur">transversales exterieures (K = 0)</option>
+                </select>
+              </label>
+            </div>
+            <label class="case"><input type="checkbox" data-champ="soudees" /><span>barres transversales soudees (figure 8.1 e)</span></label>
+            <label><span>Pression transversale p (MPa)</span><input type="text" inputmode="decimal" data-champ="p" /></label>
+          </fieldset>
+
+          <fieldset class="groupe" data-groupe="recouvrement">
+            <legend>Recouvrement</legend>
+            <label><span>&rho;<sub>1</sub>, barres recouvertes dans la section (%)</span><input type="text" inputmode="decimal" data-champ="rho1" /></label>
+            <label><span>Distance libre entre recouvrements (mm)</span><input type="text" inputmode="decimal" data-champ="a_rec" /></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Mandrin et cadres</legend>
+            <label><span>Mandrin de la barre &phi;<sub>m</sub> (mm), facultatif</span><input type="text" inputmode="decimal" data-champ="phi_m" placeholder="constat seul" /></label>
+            <label><span>&phi; du cadre (mm)</span><input type="text" inputmode="decimal" data-champ="phi_cadre" /></label>
+            <label><span>Ancrage du cadre</span>
+              <select data-champ="type_cadre">
+                <option value="crochet">crochet &ge; 135&deg;</option>
+                <option value="coude">coude 90&deg; a 135&deg;</option>
+              </select>
+            </label>
+            <label><span>Retour droit (mm), facultatif</span><input type="text" inputmode="decimal" data-champ="retour" placeholder="constat seul" /></label>
+          </fieldset>
+          <p data-role="erreur-saisie" class="erreur" role="alert" hidden></p>
+        </form>
+      </section>
+
+      <div class="colonne">
+        <section id="resultat" aria-label="resultat">
+          <h2>Resultat</h2>
+          <p data-role="erreur" class="erreur" role="alert" hidden></p>
+          <div data-role="avertissements"></div>
+          <div data-role="verdict"></div>
+          <div data-role="croquis"></div>
+          <div data-role="corps"></div>
+        </section>
+
+        <section id="mandrins" aria-label="mandrins et cadres">
+          <h2>Mandrins et cadres (§8.3, §8.5)</h2>
+          <p data-role="erreur-mandrin" class="erreur" role="alert" hidden></p>
+          <div data-role="mandrins-corps"></div>
+        </section>
+
+        <section id="synthese" aria-label="synthese par diametre">
+          <h2>Synthese par diametre</h2>
+          <p class="note">Memes conditions que la saisie, pour chaque diametre courant. Longueurs calculees, jamais recopiees d'un tableau.</p>
+          <div class="defilement" data-role="synthese-corps"></div>
+        </section>
+
+        <section id="sorties" aria-label="sorties">
+          <h2>Sorties</h2>
+          <div class="boutons">
+            <button type="button" data-action="exporter-croquis">Croquis (SVG)</button>
+            <button type="button" data-action="exporter-resultats">Resultats (CSV)</button>
+            <button type="button" data-action="exporter-note">Note de calcul (HTML imprimable)</button>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      <p>
+        Hors perimetre : ancrages par barres transversales soudees au-dela de la methode simplifiee ; ancrage des
+        cadres par barres soudees (figure 8.5 c et d) ; decalage des ancrages de paquets (§8.9.2) ; dispositifs
+        d'ancrage mecaniques (§8.8) ; armatures de precontrainte (§8.10) ; dispositions relatives des recouvrements
+        (§8.7.2), qui relevent du dessin.
+      </p>
+    </footer>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
