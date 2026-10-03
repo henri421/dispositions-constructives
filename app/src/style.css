@@ -126,8 +126,7 @@ h2 {
 
 /*
  * Reserve d'usage, permanente : elle ne prend pas la forme d'un bloc d'alerte,
- * qui reste celle des avertissements CONDITIONNELS — au premier chef celui du
- * poteau de rive ou d'angle, dont le resultat peut etre non conservatif.
+ * qui reste celle des avertissements CONDITIONNELS rendus par le noyau.
  */
 .avertissement {
   margin: 0.35rem 0 0;
