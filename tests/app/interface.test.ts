@@ -5,7 +5,7 @@ import { JETONS, valeursDesJetons } from 'aedificium-ui';
 import { ec2Recommande, verifierAncrage, verifierRecouvrement } from '../../src/index';
 import { champsDepuisModele, donneesAncrage, modeleDepuisChamps, modeleParDefaut } from '../../app/src/form';
 import { croquisAncrage, croquisRecouvrement } from '../../app/src/croquis';
-import { lignesAncrage, lignesRecouvrement, texteCoefficient } from '../../app/src/vue';
+import { blocVerdict, lignesAncrage, lignesRecouvrement, texteCoefficient, verdictHtml } from '../../app/src/vue';
 import { STYLES_TRACE, noteDeCalculHtml } from '../../app/src/export';
 import { CONFINEMENT_POUTRE, donneesBase, donneesRecouvrement } from '../fixtures';
 
@@ -51,6 +51,13 @@ describe('vues', () => {
   it('les lignes de l ancrage disent si la borne 0,7 est activee', () => {
     const r = verifierAncrage(donneesBase({ a: 120, c1: 60, c: 60, confinement: { ...CONFINEMENT_POUTRE, sommeAst: 1000 }, pressionTransversale: 10 }), P);
     expect(lignesAncrage(r).some((l) => l.libelle.includes('ACTIVEE'))).toBe(true);
+  });
+
+  it('le bloc du verdict de la note porte le meme constat que l ecran, et son motif', () => {
+    const r = verifierAncrage(donneesBase({ a: 120, c1: 60, c: 60 }), P);
+    const bloc = blocVerdict(r.verdict, r.motif);
+    expect(verdictHtml(r.verdict, r.motif)).toContain(bloc.lignes[0].valeur);
+    expect(bloc.note).toBe(r.motif);
   });
 
   it('les lignes du recouvrement disent que alpha_4 n intervient pas', () => {

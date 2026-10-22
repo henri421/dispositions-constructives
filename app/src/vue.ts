@@ -99,6 +99,15 @@ const TITRES: Record<string, string> = {
   'longueur-requise': 'Longueur requise (constat)',
 };
 
+/**
+ * Le bloc du verdict pour le CSV et la note : le meme titre que l'ecran
+ * (`verdictHtml`), suivi du motif. Sans lui, la note rapportait le motif
+ * mais taisait le constat lui-meme.
+ */
+export function blocVerdict(verdict: string, motif: string): BlocResultat {
+  return { titre: 'Verdict', lignes: [{ symbole: 'constat', libelle: 'verdict', valeur: TITRES[verdict] ?? verdict }], note: motif };
+}
+
 export function verdictHtml(verdict: string, motif: string): string {
   return `<p class="verdict verdict-${echapper(verdict)}">${echapper(TITRES[verdict] ?? verdict)}</p><p class="motif">${echapper(motif)}</p>`;
 }

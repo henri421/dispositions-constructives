@@ -20,6 +20,7 @@ import { champsDepuisModele, donneesAncrage, donneesRecouvrement, modeleDepuisCh
 import { croquisAncrage, croquisRecouvrement } from './croquis';
 import {
   blocSynthese,
+  blocVerdict,
   lignesAncrage,
   lignesMandrinEtCadre,
   lignesRecouvrement,
@@ -125,7 +126,7 @@ function rafraichir(): void {
       zones.avertissements.innerHTML = r.avertissements.map((a) => `<p class="alerte">${echapper(a)}</p>`).join('');
       const lignes = lignesAncrage(r);
       zones.corps.innerHTML = tableHtml(lignes);
-      blocs.push({ titre: 'Ancrage (§8.4)', lignes, note: null }, { titre: 'Verdict', lignes: [], note: r.motif });
+      blocs.push({ titre: 'Ancrage (§8.4)', lignes, note: null }, blocVerdict(r.verdict, r.motif));
     } else {
       const r = verifierRecouvrement(donneesRecouvrement(m), PROFIL);
       resultat = { type: 'recouvrement', r };
@@ -140,7 +141,7 @@ function rafraichir(): void {
       blocs.push(
         { titre: 'Adherence et longueur de reference (§8.4)', lignes: base, note: null },
         { titre: 'Recouvrement (§8.7)', lignes, note: r.armatureDeCouture.requise ? r.armatureDeCouture.repartition : null },
-        { titre: 'Verdict', lignes: [], note: r.motif }
+        blocVerdict(r.verdict, r.motif)
       );
     }
     zones.croquis.innerHTML = croquis;
@@ -159,6 +160,8 @@ function rafraichir(): void {
     montrer(zones.erreurMandrin, null);
   } catch (e) {
     montrer(zones.erreurMandrin, messageDErreur(e));
+    // L'ecran affiche l'erreur : la note la porte aussi, plutot qu'un silence.
+    blocs.push({ titre: 'Mandrins et cadres (§8.3, §8.5)', lignes: [], note: messageDErreur(e) });
   }
 
   const synthese = tableauParDiametre(donneesAncrage({ ...m, mode: 'ancrage' }), PROFIL, m.rho1);
