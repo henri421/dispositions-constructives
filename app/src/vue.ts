@@ -3,7 +3,7 @@
  * Module PUR. Unites : mm, mm2, MPa.
  */
 
-import { echapper, nombreFr, type BlocResultat, type LigneResultat } from 'aedificium-ui';
+import { notationHtml, nombreFr, type BlocResultat, type LigneResultat } from 'aedificium-ui';
 import type {
   LigneSynthese,
   NomAlpha,
@@ -13,6 +13,7 @@ import type {
   VerificationCadre,
   VerificationMandrin,
 } from '../../src/index';
+import type { ModeleSaisie } from './form';
 
 export function messageDErreur(e: unknown): string {
   return e instanceof Error ? e.message : String(e);
@@ -88,9 +89,29 @@ export function tableHtml(lignes: readonly LigneResultat[]): string {
   return `<table class="grandeurs"><tbody>${lignes
     .map(
       (l) =>
-        `<tr><th>${echapper(l.symbole)}</th><td class="libelle">${echapper(l.libelle)}</td><td class="valeur">${echapper(l.valeur)}</td></tr>`
+        `<tr><th>${notationHtml(l.symbole)}</th><td class="libelle">${notationHtml(l.libelle)}</td><td class="valeur">${notationHtml(l.valeur)}</td></tr>`
     )
     .join('')}</tbody></table>`;
+}
+
+/** Avertissements du noyau, un bloc d'alerte par element. */
+export function avertissementsHtml(liste: readonly string[]): string {
+  return liste.map((a) => `<p class="alerte">${notationHtml(a)}</p>`).join('');
+}
+
+/** Bloc des donnees saisies, pour le CSV et la note. */
+export function blocEntrees(m: ModeleSaisie): BlocResultat {
+  return {
+    titre: 'Donnees',
+    lignes: [
+      { symbole: 'calcul', libelle: 'objet et sollicitation', valeur: `${m.mode}, ${m.sollicitation}` },
+      { symbole: 'phi', libelle: m.paquet ? `paquet de ${m.nb} barres` : 'barre isolee', valeur: `${m.phi} mm` },
+      { symbole: 'beton / acier', libelle: 'f_ck / f_yk', valeur: `${m.fck} / ${m.fyk} MPa` },
+      { symbole: 'forme', libelle: 'extremite', valeur: m.forme },
+      { symbole: 'a, c_1, c', libelle: 'distance libre et enrobages', valeur: `${m.a}, ${m.c1}, ${m.c} mm` },
+    ],
+    note: null,
+  };
 }
 
 const TITRES: Record<string, string> = {
@@ -109,14 +130,14 @@ export function blocVerdict(verdict: string, motif: string): BlocResultat {
 }
 
 export function verdictHtml(verdict: string, motif: string): string {
-  return `<p class="verdict verdict-${echapper(verdict)}">${echapper(TITRES[verdict] ?? verdict)}</p><p class="motif">${echapper(motif)}</p>`;
+  return `<p class="verdict verdict-${verdict}">${notationHtml(TITRES[verdict] ?? verdict)}</p><p class="motif">${notationHtml(motif)}</p>`;
 }
 
 export function syntheseHtml(lignes: ReadonlyArray<LigneSynthese | { phi: number; erreur: string }>): string {
-  return `<table class="zones"><thead><tr><th>phi (mm)</th><th>f_bd (MPa)</th><th>l_b,rqd (mm)</th><th>l_bd (mm)</th><th>l_0 (mm)</th></tr></thead><tbody>${lignes
+  return `<table class="zones"><thead><tr><th>${notationHtml('phi (mm)')}</th><th>${notationHtml('f_bd (MPa)')}</th><th>${notationHtml('l_b,rqd (mm)')}</th><th>${notationHtml('l_bd (mm)')}</th><th>${notationHtml('l_0 (mm)')}</th></tr></thead><tbody>${lignes
     .map((l) =>
       'erreur' in l
-        ? `<tr><td>${l.phi}</td><td colspan="4" class="libelle">${echapper(l.erreur)}</td></tr>`
+        ? `<tr><td>${l.phi}</td><td colspan="4" class="libelle">${notationHtml(l.erreur)}</td></tr>`
         : `<tr><td>${l.phi}</td><td class="valeur">${nombreFr(l.f_bd, 2)}</td><td class="valeur">${nombreFr(l.l_b_rqd, 0)}</td><td class="valeur">${nombreFr(l.l_bd, 0)}</td><td class="valeur">${nombreFr(l.l_0, 0)}</td></tr>`
     )
     .join('')}</tbody></table>`;

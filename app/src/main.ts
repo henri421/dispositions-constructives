@@ -5,7 +5,7 @@
  * a `form`, `vue`, `croquis` et `export` — tous purs — la mise en forme.
  */
 
-import { echapper, ouvrirOuTelecharger, resultatsEnCsv, svgAutonome, telecharger, type BlocResultat } from 'aedificium-ui';
+import { ouvrirOuTelecharger, resultatsEnCsv, svgAutonome, telecharger, type BlocResultat } from 'aedificium-ui';
 import {
   ec2Recommande,
   tableauParDiametre,
@@ -19,6 +19,8 @@ import {
 import { champsDepuisModele, donneesAncrage, donneesRecouvrement, modeleDepuisChamps, modeleParDefaut, type ModeleSaisie } from './form';
 import { croquisAncrage, croquisRecouvrement } from './croquis';
 import {
+  avertissementsHtml,
+  blocEntrees,
   blocSynthese,
   blocVerdict,
   lignesAncrage,
@@ -29,7 +31,7 @@ import {
   tableHtml,
   verdictHtml,
 } from './vue';
-import { STYLES_TRACE, noteDeCalculHtml } from './export';
+import { HYPOTHESES_NOTE, STYLES_TRACE, blocsEnTexte, noteDeCalculHtml } from './export';
 import './style.css';
 
 function exige<T extends Element>(selecteur: string): T {
@@ -123,7 +125,7 @@ function rafraichir(): void {
       resultat = { type: 'ancrage', r };
       croquis = croquisAncrage(r, m.forme, m.confinement);
       zones.verdict.innerHTML = verdictHtml(r.verdict, r.motif);
-      zones.avertissements.innerHTML = r.avertissements.map((a) => `<p class="alerte">${echapper(a)}</p>`).join('');
+      zones.avertissements.innerHTML = avertissementsHtml(r.avertissements);
       const lignes = lignesAncrage(r);
       zones.corps.innerHTML = tableHtml(lignes);
       blocs.push({ titre: 'Ancrage (§8.4)', lignes, note: null }, blocVerdict(r.verdict, r.motif));
@@ -132,9 +134,8 @@ function rafraichir(): void {
       resultat = { type: 'recouvrement', r };
       croquis = croquisRecouvrement(r);
       zones.verdict.innerHTML = verdictHtml(r.verdict, r.motif);
-      zones.avertissements.innerHTML = [...r.ancrage.avertissements, ...(r.armatureDeCouture.requise ? [r.armatureDeCouture.repartition] : [])]
-        .map((a) => `<p class="alerte">${echapper(a)}</p>`)
-        .join('');
+      const couture = r.armatureDeCouture.requise ? [r.armatureDeCouture.repartition] : [];
+      zones.avertissements.innerHTML = avertissementsHtml([...r.ancrage.avertissements, ...couture]);
       const base = lignesAncrage(r.ancrage).slice(0, 7);
       const lignes = lignesRecouvrement(r);
       zones.corps.innerHTML = tableHtml([...base, ...lignes]);
@@ -171,20 +172,6 @@ function rafraichir(): void {
   etat = { modele: m, resultat, croquis, lignes: blocs };
 }
 
-function entrees(m: ModeleSaisie): BlocResultat {
-  return {
-    titre: 'Donnees',
-    lignes: [
-      { symbole: 'calcul', libelle: 'objet et sollicitation', valeur: `${m.mode}, ${m.sollicitation}` },
-      { symbole: 'phi', libelle: m.paquet ? `paquet de ${m.nb} barres` : 'barre isolee', valeur: `${m.phi} mm` },
-      { symbole: 'beton / acier', libelle: 'f_ck / f_yk', valeur: `${m.fck} / ${m.fyk} MPa` },
-      { symbole: 'forme', libelle: 'extremite', valeur: m.forme },
-      { symbole: 'a, c_1, c', libelle: 'distance libre et enrobages', valeur: `${m.a}, ${m.c1}, ${m.c} mm` },
-    ],
-    note: null,
-  };
-}
-
 document.addEventListener('click', (ev) => {
   const cible = ev.target;
   if (!(cible instanceof HTMLElement)) return;
@@ -200,7 +187,7 @@ document.addEventListener('click', (ev) => {
     }
     telecharger(`${base}.svg`, svgAutonome(e.croquis, STYLES_TRACE), 'image/svg+xml;charset=utf-8');
   } else if (action === 'exporter-resultats') {
-    telecharger(`${base}.csv`, resultatsEnCsv([entrees(e.modele), ...e.lignes]), 'text/csv;charset=utf-8');
+    telecharger(`${base}.csv`, resultatsEnCsv(blocsEnTexte([blocEntrees(e.modele), ...e.lignes])), 'text/csv;charset=utf-8');
   } else if (action === 'exporter-note') {
     const avert =
       e.resultat === null ? [] : e.resultat.type === 'ancrage' ? e.resultat.r.avertissements : e.resultat.r.ancrage.avertissements;
@@ -211,15 +198,11 @@ document.addEventListener('click', (ev) => {
           titre: `${e.modele.mode === 'ancrage' ? 'Ancrage' : 'Recouvrement'} HA${e.modele.phi}`,
           date: new Date().toISOString().slice(0, 10),
           profil: `${PROFIL.nom} (${PROFIL.date})`,
-          entrees: [entrees(e.modele)],
+          entrees: [blocEntrees(e.modele)],
           dessins: e.croquis === '' ? [] : [e.croquis],
           resultats: e.lignes,
           avertissements: avert,
-          hypotheses: [
-            'Valeurs recommandees de l EN 1992-1-1 ; aucune annexe nationale codee.',
-            'Borne alpha_2 alpha_3 alpha_5 >= 0,7 appliquee aux ancrages et aux recouvrements.',
-            'Methode simplifiee : l_b,eq porte a l_b,min, du cote de la securite.',
-          ],
+          hypotheses: HYPOTHESES_NOTE,
         },
         STYLES_TRACE
       )
