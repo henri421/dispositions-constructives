@@ -32,18 +32,18 @@ export const PHI_N_MAX = 55;
  * calculer sur un paquet que la norme ne couvre pas.
  */
 export function diametreEquivalent(phi: number, groupe: DonneesGroupe | null, recouvrement: boolean): number {
-  exigerPositif(phi, 'Le diametre phi', 'mm');
+  exigerPositif(phi, 'Le diamètre phi', 'mm');
   if (groupe === null || groupe.nb === 1) return phi;
   if (!Number.isInteger(groupe.nb) || groupe.nb < 1) {
-    throw new Error('Le nombre de barres du paquet n_b doit etre un entier strictement positif (-).');
+    throw new Error('Le nombre de barres du paquet n_b doit être un entier strictement positif (-).');
   }
   const nbMax = groupe.verticalesComprimees || recouvrement ? 4 : 3;
   if (groupe.nb > nbMax) {
-    throw new Error(`Paquet de ${groupe.nb} barres : n_b est limite a ${nbMax} dans cette configuration (§8.9.1(2)).`);
+    throw new Error(`Paquet de ${groupe.nb} barres : n_b est limité à ${nbMax} dans cette configuration (§8.9.1(2)).`);
   }
   const phi_n = phi * Math.sqrt(groupe.nb);
   if (phi_n > PHI_N_MAX) {
-    throw new Error(`Diametre equivalent phi_n = ${fr(phi_n, 1)} mm > ${PHI_N_MAX} mm : paquet hors du domaine du §8.9.1(2).`);
+    throw new Error(`Diamètre équivalent phi_n = ${fr(phi_n, 1)} mm > ${PHI_N_MAX} mm : paquet hors du domaine du §8.9.1(2).`);
   }
   return phi_n;
 }
@@ -53,13 +53,13 @@ export function contrainteOrigine(c: DonneesContrainte, f_yd: number): { sigma_s
   if (c.mode === 'f_yd') return { sigma_sd: f_yd, origine: 'f_yd' };
   if (c.mode === 'saisie') {
     exigerPositif(c.sigma_sd, 'La contrainte sigma_sd', 'MPa');
-    if (c.sigma_sd > f_yd) throw new Error(`sigma_sd = ${c.sigma_sd} MPa depasse f_yd = ${fr(f_yd, 1)} MPa.`);
+    if (c.sigma_sd > f_yd) throw new Error(`sigma_sd = ${c.sigma_sd} MPa dépasse f_yd = ${fr(f_yd, 1)} MPa.`);
     return { sigma_sd: c.sigma_sd, origine: 'saisie' };
   }
   exigerPositif(c.A_s_req, 'La section requise A_s,req', 'mm2');
   exigerPositif(c.A_s_prov, 'La section mise en place A_s,prov', 'mm2');
   if (c.A_s_req > c.A_s_prov) {
-    throw new Error('A_s,req depasse A_s,prov : la section mise en place ne suffit pas, l ancrage n a pas d objet.');
+    throw new Error("A_s,req dépasse A_s,prov : la section mise en place ne suffit pas, l'ancrage n'a pas d'objet.");
   }
   return { sigma_sd: (f_yd * c.A_s_req) / c.A_s_prov, origine: 'f_yd-reduit' };
 }
@@ -135,7 +135,7 @@ export function calculerAncrage(d: DonneesAncrage, profil: ProfilEc2, recouvreme
   const g = grandeursDeBase(d, profil, recouvrement);
   const avertissements: string[] = [];
   if (g.traction.plafonne) {
-    avertissements.push(`f_ck = ${d.fck} MPa : f_ctk,0.05 plafonne a la valeur du C60/75 pour l adherence (§8.4.2(2)).`);
+    avertissements.push(`f_ck = ${d.fck} MPa : f_ctk,0.05 plafonné à la valeur du C60/75 pour l'adhérence (§8.4.2(2)).`);
   }
   if (d.groupe !== null && d.groupe.nb > 1) {
     avertissements.push(`Paquet de ${d.groupe.nb} barres : phi_n = ${fr(g.phi_calcul, 1)} mm remplace phi (§8.9.1(2)).`);
@@ -155,14 +155,14 @@ export function calculerAncrage(d: DonneesAncrage, profil: ProfilEc2, recouvreme
   let l_calcul: number;
   if (d.methode === 'simplifiee') {
     if (d.sollicitation !== 'traction') {
-      throw new Error('La longueur equivalente simplifiee du §8.4.4(2) ne vaut qu en traction.');
+      throw new Error("La longueur équivalente simplifiée du §8.4.4(2) ne vaut qu'en traction.");
     }
     if (d.forme !== 'droite') {
       l_calcul = valeurDe(alphas.alpha_1) * g.l_b_rqd;
     } else if (d.barresTransversalesSoudees) {
       l_calcul = valeurDe(alphas.alpha_4) * g.l_b_rqd;
     } else {
-      throw new Error('La methode simplifiee vise les coudes, crochets, boucles ou barres transversales soudees (figure 8.1) ; une barre droite sans soudure releve de la methode generale.');
+      throw new Error('La méthode simplifiée vise les coudes, crochets, boucles ou barres transversales soudées (figure 8.1) ; une barre droite sans soudure relève de la méthode générale.');
     }
   } else {
     l_calcul = valeurDe(alphas.alpha_1) * valeurDe(alphas.alpha_4) * produit.retenu * g.l_b_rqd;

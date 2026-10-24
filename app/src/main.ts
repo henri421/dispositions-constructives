@@ -5,7 +5,7 @@
  * a `form`, `vue`, `croquis` et `export` — tous purs — la mise en forme.
  */
 
-import { ouvrirOuTelecharger, resultatsEnCsv, svgAutonome, telecharger, type BlocResultat } from 'aedificium-ui';
+import { notationTexte, ouvrirOuTelecharger, resultatsEnCsv, svgAutonome, telecharger, type BlocResultat } from 'aedificium-ui';
 import {
   ec2Recommande,
   tableauParDiametre,
@@ -36,7 +36,7 @@ import './style.css';
 
 function exige<T extends Element>(selecteur: string): T {
   const trouve = document.querySelector(selecteur);
-  if (trouve === null) throw new Error(`element absent de la page : ${selecteur}`);
+  if (trouve === null) throw new Error(`élément absent de la page : ${selecteur}`);
   return trouve as T;
 }
 
@@ -93,7 +93,7 @@ function ajusterLesGroupes(m: ModeleSaisie): void {
 }
 
 function montrer(el: HTMLElement, message: string | null): void {
-  el.textContent = message ?? '';
+  el.textContent = message === null ? '' : notationTexte(message);
   el.hidden = message === null;
 }
 
@@ -140,7 +140,7 @@ function rafraichir(): void {
       const lignes = lignesRecouvrement(r);
       zones.corps.innerHTML = tableHtml([...base, ...lignes]);
       blocs.push(
-        { titre: 'Adherence et longueur de reference (§8.4)', lignes: base, note: null },
+        { titre: 'Adhérence et longueur de référence (§8.4)', lignes: base, note: null },
         { titre: 'Recouvrement (§8.7)', lignes, note: r.armatureDeCouture.requise ? r.armatureDeCouture.repartition : null },
         blocVerdict(r.verdict, r.motif)
       );
@@ -182,7 +182,7 @@ document.addEventListener('click', (ev) => {
   const base = `${e.modele.mode}-HA${e.modele.phi}`;
   if (action === 'exporter-croquis') {
     if (e.croquis === '') {
-      montrer(zones.erreur, 'Aucun croquis valide a exporter : corriger la saisie.');
+      montrer(zones.erreur, 'Aucun croquis valide à exporter : corriger la saisie.');
       return;
     }
     telecharger(`${base}.svg`, svgAutonome(e.croquis, STYLES_TRACE), 'image/svg+xml;charset=utf-8');

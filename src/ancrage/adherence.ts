@@ -33,29 +33,29 @@ export interface Adherence {
  */
 export function conditionsAdherence(d: DonneesAdherence): Adherence {
   if (d.mode === 'declarees') {
-    return { conditions: d.conditions, motif: 'Conditions declarees par l utilisateur.' };
+    return { conditions: d.conditions, motif: "Conditions déclarées par l'utilisateur." };
   }
-  const h = exigerPositif(d.hauteurElement, 'La hauteur de l element coule h', 'mm');
+  const h = exigerPositif(d.hauteurElement, "La hauteur de l'élément coulé h", 'mm');
   const z = exigerPositifOuNul(d.distanceAuFond, 'La distance de la barre au fond', 'mm');
-  if (z > h) throw new Error('La distance de la barre au fond depasse la hauteur de l element (mm).');
+  if (z > h) throw new Error("La distance de la barre au fond dépasse la hauteur de l'élément (mm).");
   if (!Number.isFinite(d.inclinaison) || d.inclinaison < 0 || d.inclinaison > 90) {
-    throw new Error('L inclinaison de la barre doit etre comprise entre 0 et 90 degres (degres).');
+    throw new Error("L'inclinaison de la barre doit être comprise entre 0 et 90 degrés (degrés).");
   }
   if (d.inclinaison >= INCLINAISON_BONNE) {
-    return { conditions: 'bonnes', motif: `Barre inclinee de ${d.inclinaison} degres >= 45 : bonnes (figure 8.2 a).` };
+    return { conditions: 'bonnes', motif: `Barre inclinée de ${d.inclinaison} degrés >= 45 : bonnes (figure 8.2 a).` };
   }
   if (h <= HAUTEUR_TOUT_BON) {
     return { conditions: 'bonnes', motif: `h = ${h} mm <= 250 mm : bonnes (figure 8.2 b).` };
   }
   if (h <= HAUTEUR_ZONE_HAUTE) {
     return z <= ZONE_BASSE
-      ? { conditions: 'bonnes', motif: `h = ${h} mm, barre a ${z} mm du fond <= 250 mm : bonnes (figure 8.2 c).` }
-      : { conditions: 'mauvaises', motif: `h = ${h} mm, barre a ${z} mm du fond > 250 mm : mauvaises (figure 8.2 c).` };
+      ? { conditions: 'bonnes', motif: `h = ${h} mm, barre à ${z} mm du fond <= 250 mm : bonnes (figure 8.2 c).` }
+      : { conditions: 'mauvaises', motif: `h = ${h} mm, barre à ${z} mm du fond > 250 mm : mauvaises (figure 8.2 c).` };
   }
   const dessus = h - z;
   return dessus >= ZONE_HAUTE
-    ? { conditions: 'bonnes', motif: `h = ${h} mm > 600 mm, barre a ${dessus} mm du dessus >= 300 mm : bonnes (figure 8.2 d).` }
-    : { conditions: 'mauvaises', motif: `h = ${h} mm > 600 mm, barre a ${dessus} mm du dessus < 300 mm : mauvaises (figure 8.2 d).` };
+    ? { conditions: 'bonnes', motif: `h = ${h} mm > 600 mm, barre à ${dessus} mm du dessus >= 300 mm : bonnes (figure 8.2 d).` }
+    : { conditions: 'mauvaises', motif: `h = ${h} mm > 600 mm, barre à ${dessus} mm du dessus < 300 mm : mauvaises (figure 8.2 d).` };
 }
 
 /** eta_1 : 1,0 en bonnes conditions, 0,7 sinon, §8.4.2(2). */
@@ -65,7 +65,7 @@ export function eta1(conditions: ConditionsAdherence): number {
 
 /** eta_2 : 1,0 pour phi <= 32 mm, (132 - phi) / 100 au-dela, §8.4.2(2). phi = 32 donne 1,0 exactement. */
 export function eta2(phi: number): number {
-  exigerPositif(phi, 'Le diametre phi', 'mm');
+  exigerPositif(phi, 'Le diamètre phi', 'mm');
   return phi <= 32 ? 1 : (132 - phi) / 100;
 }
 

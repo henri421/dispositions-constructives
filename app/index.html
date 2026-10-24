@@ -11,7 +11,7 @@
   <body>
     <nav class="barre" aria-label="suite d'outils">
       <div class="barre-corps">
-        <span class="barre-nom">Aedificium &middot; Beton arme</span>
+        <span class="barre-nom">Aedificium &middot; Béton armé</span>
         <a class="barre-lien" href="https://henri421.github.io/WebAedificium/" target="_blank" rel="noopener">Suite Aedificium &#8599;</a>
       </div>
     </nav>
@@ -20,11 +20,11 @@
       <h1>dispositions-constructives</h1>
       <p class="sous-titre">
         Longueurs d'ancrage et de recouvrement des armatures, armatures de couture, paquets de barres, mandrins et
-        ancrage des cadres — EN 1992-1-1:2004, §8. Valeurs recommandees, sans annexe nationale.
+        ancrage des cadres — EN 1992-1-1:2004, §8. Valeurs recommandées, sans annexe nationale.
       </p>
       <p class="avertissement">
         Aide au calcul : l'outil constate, il ne prescrit pas. Il rend des longueurs, jamais un plan de ferraillage.
-        Les conditions d'adherence ne sont jamais supposees : declarez-les ou donnez la position de coulage.
+        Les conditions d'adhérence ne sont jamais supposées : déclarez-les ou donnez la position de coulage.
       </p>
     </header>
 
@@ -49,20 +49,20 @@
           </fieldset>
 
           <fieldset>
-            <legend>Barre et materiaux</legend>
+            <legend>Barre et matériaux</legend>
             <label><span>&phi; (mm)</span><input type="text" inputmode="decimal" data-champ="phi" /></label>
             <label class="case"><input type="checkbox" data-champ="paquet" /><span>paquet de barres (§8.9)</span></label>
             <div class="groupe" data-groupe="paquet">
               <label><span>n<sub>b</sub> (-)</span><input type="text" inputmode="decimal" data-champ="nb" /></label>
-              <label class="case"><input type="checkbox" data-champ="verticales" /><span>barres verticales comprimees</span></label>
+              <label class="case"><input type="checkbox" data-champ="verticales" /><span>barres verticales comprimées</span></label>
             </div>
             <label><span>f<sub>ck</sub> (MPa)</span><input type="text" inputmode="decimal" data-champ="fck" /></label>
             <label><span>f<sub>yk</sub> (MPa)</span><input type="text" inputmode="decimal" data-champ="fyk" /></label>
-            <label><span>&sigma;<sub>sd</sub> a l'origine</span>
+            <label><span>&sigma;<sub>sd</sub> à l'origine</span>
               <select data-champ="sig_mode">
-                <option value="f_yd">f_yd (conservatif)</option>
+                <option value="f_yd">fyd (conservatif)</option>
                 <option value="saisie">saisie</option>
-                <option value="reduite">f_yd A_s,req / A_s,prov</option>
+                <option value="reduite">fyd As,req / As,prov</option>
               </select>
             </label>
             <div class="groupe" data-groupe="sig-saisie">
@@ -75,30 +75,30 @@
           </fieldset>
 
           <fieldset>
-            <legend>Adherence (figure 8.2)</legend>
+            <legend>Adhérence (figure 8.2)</legend>
             <label><span>Conditions</span>
               <select data-champ="adh_mode">
-                <option value="declarees">declarees</option>
-                <option value="geometrie">deduites de la position de coulage</option>
+                <option value="declarees">déclarées</option>
+                <option value="geometrie">déduites de la position de coulage</option>
               </select>
             </label>
             <div class="groupe" data-groupe="adh-declarees">
-              <label><span>Conditions d'adherence</span>
+              <label><span>Conditions d'adhérence</span>
                 <select data-champ="conditions">
-                  <option value="mauvaises">mauvaises (&eta;1 = 0,7)</option>
-                  <option value="bonnes">bonnes (&eta;1 = 1)</option>
+                  <option value="mauvaises">mauvaises (η₁ = 0,7)</option>
+                  <option value="bonnes">bonnes (η₁ = 1)</option>
                 </select>
               </label>
             </div>
             <div class="groupe" data-groupe="adh-geometrie">
               <label><span>Inclinaison de la barre (&deg;)</span><input type="text" inputmode="decimal" data-champ="inclinaison" /></label>
-              <label><span>Hauteur coulee h (mm)</span><input type="text" inputmode="decimal" data-champ="h_element" /></label>
+              <label><span>Hauteur coulée h (mm)</span><input type="text" inputmode="decimal" data-champ="h_element" /></label>
               <label><span>Distance de la barre au fond (mm)</span><input type="text" inputmode="decimal" data-champ="z_fond" /></label>
             </div>
           </fieldset>
 
           <fieldset>
-            <legend>Extremite et enrobage (figure 8.3)</legend>
+            <legend>Extrémité et enrobage (figure 8.3)</legend>
             <label><span>Forme</span>
               <select data-champ="forme">
                 <option value="droite">droite</option>
@@ -107,13 +107,13 @@
               </select>
             </label>
             <label><span>a, distance libre entre barres (mm)</span><input type="text" inputmode="decimal" data-champ="a" /></label>
-            <label><span>c<sub>1</sub>, enrobage lateral (mm)</span><input type="text" inputmode="decimal" data-champ="c1" /></label>
+            <label><span>c<sub>1</sub>, enrobage latéral (mm)</span><input type="text" inputmode="decimal" data-champ="c1" /></label>
             <label><span>c, enrobage de fond (mm)</span><input type="text" inputmode="decimal" data-champ="c" /></label>
             <div class="groupe" data-groupe="methode">
-              <label><span>Methode</span>
+              <label><span>Méthode</span>
                 <select data-champ="methode">
-                  <option value="generale">generale §8.4.4(1)</option>
-                  <option value="simplifiee">l_b,eq simplifiee §8.4.4(2)</option>
+                  <option value="generale">générale §8.4.4(1)</option>
+                  <option value="simplifiee">longueur équivalente simplifiée §8.4.4(2)</option>
                 </select>
               </label>
             </div>
@@ -121,12 +121,12 @@
 
           <fieldset>
             <legend>Confinement</legend>
-            <label class="case"><input type="checkbox" data-champ="confinement" /><span>armatures transversales non soudees</span></label>
+            <label class="case"><input type="checkbox" data-champ="confinement" /><span>armatures transversales non soudées</span></label>
             <div class="groupe" data-groupe="confinement">
-              <label><span>Element</span>
+              <label><span>Élément</span>
                 <select data-champ="type_element">
-                  <option value="poutre">poutre (A_st,min = 0,25 A_s)</option>
-                  <option value="dalle">dalle (A_st,min = 0)</option>
+                  <option value="poutre">poutre (Aₛₜ,min = 0,25 Aₛ)</option>
+                  <option value="dalle">dalle (Aₛₜ,min = 0)</option>
                 </select>
               </label>
               <label><span>&Sigma;A<sub>st</sub> le long de l<sub>bd</sub> (mm&sup2;)</span><input type="text" inputmode="decimal" data-champ="somme_ast" /></label>
@@ -134,11 +134,11 @@
                 <select data-champ="position">
                   <option value="angle">barre dans l'angle (K = 0,1)</option>
                   <option value="courant">le long d'un brin (K = 0,05)</option>
-                  <option value="exterieur">transversales exterieures (K = 0)</option>
+                  <option value="exterieur">transversales extérieures (K = 0)</option>
                 </select>
               </label>
             </div>
-            <label class="case"><input type="checkbox" data-champ="soudees" /><span>barres transversales soudees (figure 8.1 e)</span></label>
+            <label class="case"><input type="checkbox" data-champ="soudees" /><span>barres transversales soudées (figure 8.1 e)</span></label>
             <label><span>Pression transversale p (MPa)</span><input type="text" inputmode="decimal" data-champ="p" /></label>
           </fieldset>
 
@@ -155,7 +155,7 @@
             <label><span>Ancrage du cadre</span>
               <select data-champ="type_cadre">
                 <option value="crochet">crochet &ge; 135&deg;</option>
-                <option value="coude">coude 90&deg; a 135&deg;</option>
+                <option value="coude">coude 90&deg; à 135&deg;</option>
               </select>
             </label>
             <label><span>Retour droit (mm), facultatif</span><input type="text" inputmode="decimal" data-champ="retour" placeholder="constat seul" /></label>
@@ -165,8 +165,8 @@
       </section>
 
       <div class="colonne">
-        <section id="resultat" aria-label="resultat">
-          <h2>Resultat</h2>
+        <section id="resultat" aria-label="résultat">
+          <h2>Résultat</h2>
           <p data-role="erreur" class="erreur" role="alert" hidden></p>
           <div data-role="avertissements"></div>
           <div data-role="verdict"></div>
@@ -180,9 +180,9 @@
           <div data-role="mandrins-corps"></div>
         </section>
 
-        <section id="synthese" aria-label="synthese par diametre">
-          <h2>Synthese par diametre</h2>
-          <p class="note">Memes conditions que la saisie, pour chaque diametre courant. Longueurs calculees, jamais recopiees d'un tableau.</p>
+        <section id="synthese" aria-label="synthèse par diamètre">
+          <h2>Synthèse par diamètre</h2>
+          <p class="note">Mêmes conditions que la saisie, pour chaque diamètre courant. Longueurs calculées, jamais recopiées d'un tableau.</p>
           <div class="defilement" data-role="synthese-corps"></div>
         </section>
 
@@ -190,7 +190,7 @@
           <h2>Sorties</h2>
           <div class="boutons">
             <button type="button" data-action="exporter-croquis">Croquis (SVG)</button>
-            <button type="button" data-action="exporter-resultats">Resultats (CSV)</button>
+            <button type="button" data-action="exporter-resultats">Résultats (CSV)</button>
             <button type="button" data-action="exporter-note">Note de calcul (HTML imprimable)</button>
           </div>
         </section>
@@ -199,10 +199,10 @@
 
     <footer>
       <p>
-        Hors perimetre : ancrages par barres transversales soudees au-dela de la methode simplifiee ; ancrage des
-        cadres par barres soudees (figure 8.5 c et d) ; decalage des ancrages de paquets (§8.9.2) ; dispositifs
-        d'ancrage mecaniques (§8.8) ; armatures de precontrainte (§8.10) ; dispositions relatives des recouvrements
-        (§8.7.2), qui relevent du dessin.
+        Hors périmètre : ancrages par barres transversales soudées au-delà de la méthode simplifiée ; ancrage des
+        cadres par barres soudées (figure 8.5 c et d) ; décalage des ancrages de paquets (§8.9.2) ; dispositifs
+        d'ancrage mécaniques (§8.8) ; armatures de précontrainte (§8.10) ; dispositions relatives des recouvrements
+        (§8.7.2), qui relèvent du dessin.
       </p>
     </footer>
 

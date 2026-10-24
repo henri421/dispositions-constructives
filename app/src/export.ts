@@ -9,9 +9,9 @@ import { JETONS, notationHtml, notationTexte, type BlocResultat } from 'aedifici
 
 /** Hypotheses et limites rappelees dans la note de calcul. */
 export const HYPOTHESES_NOTE: string[] = [
-  'Valeurs recommandees de l EN 1992-1-1 ; aucune annexe nationale codee.',
-  'Borne alpha_2 alpha_3 alpha_5 >= 0,7 appliquee aux ancrages et aux recouvrements.',
-  'Methode simplifiee : l_b,eq porte a l_b,min, du cote de la securite.',
+  "Valeurs recommandées de l'EN 1992-1-1 ; aucune annexe nationale codée.",
+  'Borne alpha_2 alpha_3 alpha_5 >= 0,7 appliquée aux ancrages et aux recouvrements.',
+  'Méthode simplifiée : l_b,eq porté à l_b,min, du côté de la sécurité.',
 ];
 
 /** Copie des blocs ou tout le texte affiche passe en notation texte (CSV). */
@@ -62,8 +62,8 @@ export interface NoteDeCalcul {
 
 const AIDE_AU_CALCUL =
   "Outil d'aide au calcul. Cet outil constate, il ne prescrit pas : il rend des longueurs, " +
-  "jamais un plan de ferraillage. La verification finale et la responsabilite incombent a " +
-  "l'ingenieur du projet. Cette note est un compte rendu, pas une justification reglementaire signee.";
+  "jamais un plan de ferraillage. La vérification finale et la responsabilité incombent à " +
+  "l'ingénieur du projet. Cette note est un compte rendu, pas une justification réglementaire signée.";
 
 const STYLE_NOTE = `
   body { margin: 0; padding: 24px 28px; background: var(--surface); color: var(--texte); font: 14px/1.5 var(--sans); }
@@ -110,7 +110,7 @@ export function noteDeCalculHtml(note: NoteDeCalcul, styles: string): string {
   const hypotheses =
     note.hypotheses.length === 0
       ? ''
-      : `<h2>Hypotheses et limites</h2><ul>${note.hypotheses.map((h) => `<li>${notationHtml(h)}</li>`).join('')}</ul>`;
+      : `<h2>Hypothèses et limites</h2><ul>${note.hypotheses.map((h) => `<li>${notationHtml(h)}</li>`).join('')}</ul>`;
   return `<!doctype html>
 <html lang="fr"><head><meta charset="utf-8" />
 <title>Note de calcul — ${notationHtml(note.titre)}</title>
@@ -119,9 +119,9 @@ export function noteDeCalculHtml(note: NoteDeCalcul, styles: string): string {
 <h1>Note de calcul — ancrages et recouvrements (EN 1992-1-1 §8)</h1>
 <p class="date">${notationHtml(note.titre)} · ${notationHtml(note.date)} · profil : ${notationHtml(note.profil)}</p>
 ${avertissements}
-<h2>Donnees d entree</h2>${note.entrees.map(tableDuBloc).join('')}
+<h2>Données d'entrée</h2>${note.entrees.map(tableDuBloc).join('')}
 <h2>Croquis</h2>${dessins}
-<h2>Verifications</h2>${note.resultats.map(tableDuBloc).join('')}
+<h2>Vérifications</h2>${note.resultats.map(tableDuBloc).join('')}
 ${hypotheses}
 <p class="pied">${AIDE_AU_CALCUL}</p>
 </body></html>`;

@@ -21,7 +21,7 @@ function fr(x: number, d: number): string {
 /** alpha_6 = (rho_1 / 25)^0,5, borne a [1,0 ; 1,5], expression (8.10) et tableau 8.3. */
 export function coefficientAlpha6(rho1: number): number {
   if (!Number.isFinite(rho1) || rho1 <= 0 || rho1 > 100) {
-    throw new Error('Le pourcentage de barres recouvertes rho_1 doit etre compris entre 0 exclu et 100 (%).');
+    throw new Error('Le pourcentage de barres recouvertes rho_1 doit être compris entre 0 exclu et 100 (%).');
   }
   return Math.min(1.5, Math.max(1, Math.sqrt(rho1 / 25)));
 }
@@ -62,22 +62,22 @@ export function armatureDeCouture(
       requise: false,
       A_st: 0,
       repartition: '',
-      motif: `phi = ${phi} mm${phi < 20 ? ' < 20 mm' : ''}${rho1 < 25 ? `, rho_1 = ${rho1} % < 25 %` : ''} : les armatures transversales necessaires par ailleurs suffisent (§8.7.4.1(2)).`,
+      motif: `phi = ${phi} mm${phi < 20 ? ' < 20 mm' : ''}${rho1 < 25 ? `, rho_1 = ${rho1} % < 25 %` : ''} : les armatures transversales nécessaires par ailleurs suffisent (§8.7.4.1(2)).`,
     };
   }
   const tiers = l_0 / 3;
-  let repartition = `Sigma A_st / 2 = ${fr((As / 2), 0)} mm2 dans chacun des deux tiers extremes du recouvrement (${fr(tiers, 0)} mm), parallele au lit des barres recouvertes (§8.7.4.1(3) et (4)).`;
+  let repartition = `Sigma A_st / 2 = ${fr((As / 2), 0)} mm2 dans chacun des deux tiers extrêmes du recouvrement (${fr(tiers, 0)} mm), parallèle au lit des barres recouvertes (§8.7.4.1(3) et (4)).`;
   if (rho1 > 50 && a <= 10 * phi) {
-    repartition += ` Plus de 50 % recouverts et a = ${a} mm <= 10 phi : cadres ou U ancres dans la masse du beton.`;
+    repartition += ` Plus de 50 % recouverts et a = ${a} mm <= 10 phi : cadres ou U ancrés dans la masse du béton.`;
   }
   if (compression) {
-    repartition += ` Barres comprimees : une barre transversale en plus au-dela de chaque extremite, a moins de 4 phi = ${4 * phi} mm (§8.7.4.2).`;
+    repartition += ` Barres comprimées : une barre transversale en plus au-delà de chaque extrémité, à moins de 4 phi = ${4 * phi} mm (§8.7.4.2).`;
   }
   return {
     requise: true,
     A_st: As,
     repartition,
-    motif: `phi = ${phi} mm >= 20 mm et rho_1 = ${rho1} % >= 25 % : Sigma A_st >= A_s d une barre recouverte.`,
+    motif: `phi = ${phi} mm >= 20 mm et rho_1 = ${rho1} % >= 25 % : Sigma A_st >= A_s d'une barre recouverte.`,
   };
 }
 
@@ -91,7 +91,7 @@ export function armatureDeCouture(
  */
 export function verifierRecouvrement(d: DonneesRecouvrement, profil: ProfilEc2): ResultatRecouvrement {
   if (d.methode !== 'generale') {
-    throw new Error('Le recouvrement se calcule par l expression (8.10) : la methode simplifiee de l ancrage ne s y applique pas.');
+    throw new Error("Le recouvrement se calcule par l'expression (8.10) : la méthode simplifiée de l'ancrage ne s'y applique pas.");
   }
   // L'ancrage fournit l_b,rqd, c_d et alpha_1, alpha_2, alpha_5 ; la
   // longueur disponible n'y est pas jugee (elle l'est sur l_0).
@@ -101,7 +101,7 @@ export function verifierRecouvrement(d: DonneesRecouvrement, profil: ProfilEc2):
 
   let alpha_3: OrigineCoefficient;
   if (d.sollicitation === 'compression') {
-    alpha_3 = { statut: 'fixe-par-la-norme', valeur: 1, motif: 'barre comprimee : 1 (tableau 8.2)' };
+    alpha_3 = { statut: 'fixe-par-la-norme', valeur: 1, motif: 'barre comprimée : 1 (tableau 8.2)' };
   } else if (d.confinement === null) {
     alpha_3 = { statut: 'non-applicable', motif: 'aucune armature transversale prise en compte' };
   } else {
@@ -114,7 +114,7 @@ export function verifierRecouvrement(d: DonneesRecouvrement, profil: ProfilEc2):
     alpha_3 = {
       statut: 'calcule',
       valeur: Math.min(1, Math.max(0.7, brut)),
-      detail: `Sigma A_st,min = A_s sigma_sd / f_yd = ${fr(min, 0)} mm2 ; 1 - K lambda = ${fr(brut, 3)}, borne a [0,7 ; 1]`,
+      detail: `Sigma A_st,min = A_s sigma_sd / f_yd = ${fr(min, 0)} mm2 ; 1 - K lambda = ${fr(brut, 3)}, borné à [0,7 ; 1]`,
     };
   }
 

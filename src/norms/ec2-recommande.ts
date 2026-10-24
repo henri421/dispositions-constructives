@@ -8,7 +8,7 @@ const EN = 'EN 1992-1-1:2004, valeur recommandee';
 
 export function ec2Recommande(): ProfilEc2 {
   return {
-    nom: 'Eurocode 2, valeurs recommandees',
+    nom: 'Eurocode 2, valeurs recommandées',
     date: '2026-10-01',
     gamma_C: { valeur: 1.5, source: `${EN}, tableau 2.1N` },
     gamma_S: { valeur: 1.15, source: `${EN}, tableau 2.1N` },

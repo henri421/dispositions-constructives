@@ -17,7 +17,7 @@ export const FCK_PLAFOND_ADHERENCE = 60;
  * `section-uls`.
  */
 export function fctmDepuisFck(fck: number): number {
-  exigerPositif(fck, 'La resistance caracteristique du beton f_ck', 'MPa');
+  exigerPositif(fck, 'La résistance caractéristique du béton f_ck', 'MPa');
   return fck <= 50 ? 0.3 * fck ** (2 / 3) : 2.12 * Math.log(1 + (fck + 8) / 10);
 }
 
@@ -44,7 +44,7 @@ export interface TractionDeCalcul {
  * surevaluee — piege classique des tableurs.
  */
 export function tractionPourAdherence(fck: number, profil: ProfilEc2): TractionDeCalcul {
-  exigerPositif(fck, 'La resistance caracteristique du beton f_ck', 'MPa');
+  exigerPositif(fck, 'La résistance caractéristique du béton f_ck', 'MPa');
   const fck_retenu = Math.min(fck, FCK_PLAFOND_ADHERENCE);
   const fctm = fctmDepuisFck(fck_retenu);
   const fctk005 = fctk005DepuisFctm(fctm);
@@ -59,12 +59,12 @@ export function tractionPourAdherence(fck: number, profil: ProfilEc2): TractionD
 
 /** f_cd = alpha_cc f_ck / gamma_C, §3.1.6(1)P (MPa). */
 export function fcd(fck: number, profil: ProfilEc2): number {
-  exigerPositif(fck, 'La resistance caracteristique du beton f_ck', 'MPa');
+  exigerPositif(fck, 'La résistance caractéristique du béton f_ck', 'MPa');
   return (profil.alpha_cc.valeur * fck) / profil.gamma_C.valeur;
 }
 
 /** f_yd = f_yk / gamma_S, §3.2.7 (MPa). */
 export function fyd(fyk: number, profil: ProfilEc2): number {
-  exigerPositif(fyk, 'La limite d elasticite f_yk', 'MPa');
+  exigerPositif(fyk, "La limite d'élasticité f_yk", 'MPa');
   return fyk / profil.gamma_S.valeur;
 }

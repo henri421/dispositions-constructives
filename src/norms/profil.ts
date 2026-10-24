@@ -45,10 +45,10 @@ export function verifierProfil(p: ProfilEc2): void {
     if (nom === 'nom' || nom === 'date') continue;
     const vs = v as ValeurSourcee;
     if (!Number.isFinite(vs.valeur) || vs.valeur <= 0) {
-      throw new Error(`Profil « ${p.nom} » : ${nom} doit etre un nombre strictement positif.`);
+      throw new Error(`Profil « ${p.nom} » : ${nom} doit être un nombre strictement positif.`);
     }
     if (typeof vs.source !== 'string' || vs.source.trim() === '') {
-      throw new Error(`Profil « ${p.nom} » : ${nom} n a pas de source. Une valeur de provenance inconnue bloque le calcul.`);
+      throw new Error(`Profil « ${p.nom} » : ${nom} n'a pas de source. Une valeur de provenance inconnue bloque le calcul.`);
     }
   }
 }
@@ -56,7 +56,7 @@ export function verifierProfil(p: ProfilEc2): void {
 /** Valeur strictement positive et finie, sinon erreur nommant la grandeur. */
 export function exigerPositif(valeur: number, nom: string, unite: string): number {
   if (!Number.isFinite(valeur) || valeur <= 0) {
-    throw new Error(`${nom} doit etre un nombre strictement positif (${unite}).`);
+    throw new Error(`${nom} doit être un nombre strictement positif (${unite}).`);
   }
   return valeur;
 }
@@ -64,7 +64,7 @@ export function exigerPositif(valeur: number, nom: string, unite: string): numbe
 /** Valeur positive ou nulle et finie, sinon erreur nommant la grandeur. */
 export function exigerPositifOuNul(valeur: number, nom: string, unite: string): number {
   if (!Number.isFinite(valeur) || valeur < 0) {
-    throw new Error(`${nom} doit etre un nombre positif ou nul (${unite}).`);
+    throw new Error(`${nom} doit être un nombre positif ou nul (${unite}).`);
   }
   return valeur;
 }

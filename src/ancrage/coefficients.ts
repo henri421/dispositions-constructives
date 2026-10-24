@@ -37,8 +37,8 @@ function borner(v: number): number {
  */
 export function enrobageEquivalent(forme: FormeExtremite, a: number, c1: number, c: number): number {
   exigerPositifOuNul(a, 'La distance libre entre barres a', 'mm');
-  exigerPositifOuNul(c1, 'L enrobage lateral c_1', 'mm');
-  exigerPositifOuNul(c, 'L enrobage de fond c', 'mm');
+  exigerPositifOuNul(c1, "L'enrobage latéral c_1", 'mm');
+  exigerPositifOuNul(c, "L'enrobage de fond c", 'mm');
   switch (forme) {
     case 'droite':
       return Math.min(a / 2, c1, c);
@@ -95,7 +95,7 @@ export function valeurDe(o: OrigineCoefficient): number {
 export function coefficientsAlpha(e: EntreesAlphas): Record<NomAlpha, OrigineCoefficient> {
   const droite = e.forme === 'droite';
   const comprime = e.sollicitation === 'compression';
-  const motifC = 'barre comprimee : 1 (tableau 8.2)';
+  const motifC = 'barre comprimée : 1 (tableau 8.2)';
 
   const alpha_1: OrigineCoefficient = comprime
     ? { statut: 'fixe-par-la-norme', valeur: 1, motif: motifC }
@@ -114,7 +114,7 @@ export function coefficientsAlpha(e: EntreesAlphas): Record<NomAlpha, OrigineCoe
     alpha_2 = {
       statut: 'calcule',
       valeur: borner(brut),
-      detail: `1 - 0,15 (c_d - ${droite ? 'phi' : '3 phi'}) / phi = ${fr(brut, 3)}, borne a [0,7 ; 1]`,
+      detail: `1 - 0,15 (c_d - ${droite ? 'phi' : '3 phi'}) / phi = ${fr(brut, 3)}, borné à [0,7 ; 1]`,
     };
   }
 
@@ -128,22 +128,22 @@ export function coefficientsAlpha(e: EntreesAlphas): Record<NomAlpha, OrigineCoe
     alpha_3 = {
       statut: 'calcule',
       valeur: borner(brut),
-      detail: `1 - K lambda = 1 - ${e.confinement.K} x ${fr(e.confinement.lambda, 3)} = ${fr(brut, 3)}, borne a [0,7 ; 1]`,
+      detail: `1 - K lambda = 1 - ${e.confinement.K} x ${fr(e.confinement.lambda, 3)} = ${fr(brut, 3)}, borné à [0,7 ; 1]`,
     };
   }
 
   const alpha_4: OrigineCoefficient = e.soudees
-    ? { statut: 'fixe-par-la-norme', valeur: 0.7, motif: 'barres transversales soudees, figure 8.1 e) : 0,7 (tableau 8.2)' }
-    : { statut: 'non-applicable', motif: 'aucune barre transversale soudee' };
+    ? { statut: 'fixe-par-la-norme', valeur: 0.7, motif: 'barres transversales soudées, figure 8.1 e) : 0,7 (tableau 8.2)' }
+    : { statut: 'non-applicable', motif: 'aucune barre transversale soudée' };
 
   let alpha_5: OrigineCoefficient;
   if (comprime) {
-    alpha_5 = { statut: 'non-applicable', motif: 'barre comprimee : sans objet (tableau 8.2)' };
+    alpha_5 = { statut: 'non-applicable', motif: 'barre comprimée : sans objet (tableau 8.2)' };
   } else if (exigerPositifOuNul(e.p, 'La pression transversale p', 'MPa') === 0) {
-    alpha_5 = { statut: 'non-applicable', motif: 'aucune pression transversale declaree' };
+    alpha_5 = { statut: 'non-applicable', motif: 'aucune pression transversale déclarée' };
   } else {
     const brut = 1 - 0.04 * e.p;
-    alpha_5 = { statut: 'calcule', valeur: borner(brut), detail: `1 - 0,04 p = ${fr(brut, 3)}, borne a [0,7 ; 1]` };
+    alpha_5 = { statut: 'calcule', valeur: borner(brut), detail: `1 - 0,04 p = ${fr(brut, 3)}, borné à [0,7 ; 1]` };
   }
 
   return { alpha_1, alpha_2, alpha_3, alpha_4, alpha_5 };

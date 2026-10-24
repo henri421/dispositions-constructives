@@ -42,17 +42,17 @@ export function croquisAncrage(r: ResultatAncrage, forme: FormeExtremite, confin
         .join('')
     : '';
   const lmin = X0 + r.l_b_min * ech;
-  return `<svg class="croquis" viewBox="0 0 ${L} ${H}" role="img" aria-label="Croquis de l ancrage">
+  return `<svg class="croquis" viewBox="0 0 ${L} ${H}" role="img" aria-label="Croquis de l'ancrage">
 <rect class="beton" x="${X0}" y="40" width="${(x1 - X0 + 60).toFixed(1)}" height="100"/>
 <line class="origine" x1="${X0}" y1="28" x2="${X0}" y2="152"/>
-<text class="petit" x="${X0 - 60}" y="22">${notationSvg('origine de l ancrage')}</text>
+<text class="petit" x="${X0 - 60}" y="22">${notationSvg("origine de l'ancrage")}</text>
 <line class="barre" x1="${X0 - 60}" y1="${yB}" x2="${x1.toFixed(1)}" y2="${yB}"/>
 ${extremite(forme, x1, yB)}${transversales}
 <line class="lmin" x1="${lmin.toFixed(1)}" y1="${yB - 18}" x2="${lmin.toFixed(1)}" y2="${yB + 18}"/>
 <text class="petit" x="${lmin.toFixed(1)}" y="${yB - 22}" text-anchor="middle">${notationSvg('l_b,min')}</text>
 ${cote(X0, x1, 175, `l_bd = ${aff(r.l_bd, 0)} mm`)}
-<text class="petit" x="${X0 + 4}" y="54">${notationSvg(`c_d = ${aff(r.c_d, 0)} mm · phi${r.phi_calcul === Math.round(r.phi_calcul) ? '' : '_n'} = ${aff(r.phi_calcul, 1)} mm · ${r.sollicitation} · adherence ${r.conditionsAdherence}`)}</text>
-<text class="legende" x="12" y="${H - 6}">${notationSvg('Longueur a l echelle ; diametre et enrobage non a l echelle.')}</text>
+<text class="petit" x="${X0 + 4}" y="54">${notationSvg(`c_d = ${aff(r.c_d, 0)} mm · phi${r.phi_calcul === Math.round(r.phi_calcul) ? '' : '_n'} = ${aff(r.phi_calcul, 1)} mm · ${r.sollicitation} · adhérence ${r.conditionsAdherence}`)}</text>
+<text class="legende" x="12" y="${H - 6}">${notationSvg("Longueur à l'échelle ; diamètre et enrobage non à l'échelle.")}</text>
 </svg>`;
 }
 
@@ -77,7 +77,7 @@ ${couture}
 <line class="barre" x1="30" y1="82" x2="${xb.toFixed(1)}" y2="82"/>
 <line class="barre" x1="${xa}" y1="98" x2="${L - 30}" y2="98"/>
 ${cote(xa, xb, 175, `l_0 = ${aff(r.l_0, 0)} mm`)}
-<text class="petit" x="24" y="54">${notationSvg(`rho_1 = ${aff(r.rho1, 0)} % · alpha_6 = ${aff(r.alpha_6, 3)}${r.armatureDeCouture.requise ? ` · couture Sigma A_st = ${aff(r.armatureDeCouture.A_st, 0)} mm2, moitie par tiers extreme` : ''}`)}</text>
-<text class="legende" x="12" y="${H - 6}">${notationSvg('Longueur a l echelle ; diametre et ecartement non a l echelle.')}</text>
+<text class="petit" x="24" y="54">${notationSvg(`rho_1 = ${aff(r.rho1, 0)} % · alpha_6 = ${aff(r.alpha_6, 3)}${r.armatureDeCouture.requise ? ` · couture Sigma A_st = ${aff(r.armatureDeCouture.A_st, 0)} mm2, moitié dans chaque tiers extrême` : ''}`)}</text>
+<text class="legende" x="12" y="${H - 6}">${notationSvg("Longueur à l'échelle ; diamètre et écartement non à l'échelle.")}</text>
 </svg>`;
 }
