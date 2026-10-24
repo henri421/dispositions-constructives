@@ -6,13 +6,16 @@
  * ce que la legende dit.
  */
 
-import { notationSvg, nombreFr } from 'aedificium-ui';
+import { notationSvg, nombreAffiche } from 'aedificium-ui';
 import type { FormeExtremite, ResultatAncrage, ResultatRecouvrement } from '../../src/index';
 
 const L = 640;
 const H = 210;
 const X0 = 90;
 const UTILE = 470;
+
+/** Nombre affiche : trois decimales au plus, sans zeros inutiles. */
+const aff = (v: number, d: number): string => nombreAffiche(v, Math.min(d, 3));
 
 function cote(x0: number, x1: number, y: number, texte: string): string {
   return `<g class="cote"><line x1="${x0.toFixed(1)}" y1="${y}" x2="${x1.toFixed(1)}" y2="${y}"/><line x1="${x0.toFixed(1)}" y1="${y - 6}" x2="${x0.toFixed(1)}" y2="${y + 6}"/><line x1="${x1.toFixed(1)}" y1="${y - 6}" x2="${x1.toFixed(1)}" y2="${y + 6}"/><text x="${((x0 + x1) / 2).toFixed(1)}" y="${y - 6}">${notationSvg(texte)}</text></g>`;
@@ -47,8 +50,8 @@ export function croquisAncrage(r: ResultatAncrage, forme: FormeExtremite, confin
 ${extremite(forme, x1, yB)}${transversales}
 <line class="lmin" x1="${lmin.toFixed(1)}" y1="${yB - 18}" x2="${lmin.toFixed(1)}" y2="${yB + 18}"/>
 <text class="petit" x="${lmin.toFixed(1)}" y="${yB - 22}" text-anchor="middle">${notationSvg('l_b,min')}</text>
-${cote(X0, x1, 175, `l_bd = ${nombreFr(r.l_bd, 0)} mm`)}
-<text class="petit" x="${X0 + 4}" y="54">${notationSvg(`c_d = ${nombreFr(r.c_d, 0)} mm · phi${r.phi_calcul === Math.round(r.phi_calcul) ? '' : '_n'} = ${nombreFr(r.phi_calcul, 1)} mm · ${r.sollicitation} · adherence ${r.conditionsAdherence}`)}</text>
+${cote(X0, x1, 175, `l_bd = ${aff(r.l_bd, 0)} mm`)}
+<text class="petit" x="${X0 + 4}" y="54">${notationSvg(`c_d = ${aff(r.c_d, 0)} mm · phi${r.phi_calcul === Math.round(r.phi_calcul) ? '' : '_n'} = ${aff(r.phi_calcul, 1)} mm · ${r.sollicitation} · adherence ${r.conditionsAdherence}`)}</text>
 <text class="legende" x="12" y="${H - 6}">${notationSvg('Longueur a l echelle ; diametre et enrobage non a l echelle.')}</text>
 </svg>`;
 }
@@ -73,8 +76,8 @@ export function croquisRecouvrement(r: ResultatRecouvrement): string {
 ${couture}
 <line class="barre" x1="30" y1="82" x2="${xb.toFixed(1)}" y2="82"/>
 <line class="barre" x1="${xa}" y1="98" x2="${L - 30}" y2="98"/>
-${cote(xa, xb, 175, `l_0 = ${nombreFr(r.l_0, 0)} mm`)}
-<text class="petit" x="24" y="54">${notationSvg(`rho_1 = ${nombreFr(r.rho1, 0)} % · alpha_6 = ${nombreFr(r.alpha_6, 3)}${r.armatureDeCouture.requise ? ` · couture Sigma A_st = ${nombreFr(r.armatureDeCouture.A_st, 0)} mm2, moitie par tiers extreme` : ''}`)}</text>
+${cote(xa, xb, 175, `l_0 = ${aff(r.l_0, 0)} mm`)}
+<text class="petit" x="24" y="54">${notationSvg(`rho_1 = ${aff(r.rho1, 0)} % · alpha_6 = ${aff(r.alpha_6, 3)}${r.armatureDeCouture.requise ? ` · couture Sigma A_st = ${aff(r.armatureDeCouture.A_st, 0)} mm2, moitie par tiers extreme` : ''}`)}</text>
 <text class="legende" x="12" y="${H - 6}">${notationSvg('Longueur a l echelle ; diametre et ecartement non a l echelle.')}</text>
 </svg>`;
 }

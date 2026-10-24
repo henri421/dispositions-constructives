@@ -11,9 +11,11 @@ import { exigerPositif, exigerPositifOuNul } from '../norms/profil';
 import { coefficientK, lambdaConfinement, valeurDe } from './coefficients';
 import { calculerAncrage, verdictLongueur } from './ancrage';
 
-/** Nombre a la francaise pour les motifs affiches. */
+/** Nombre a la francaise pour les motifs affiches : sans zeros inutiles de fin. */
 function fr(x: number, d: number): string {
-  return x.toFixed(d).replace('.', ',');
+  const texte = x.toFixed(d).replace('.', ',');
+  const sans = texte.includes(',') ? texte.replace(/,?0+$/, '') : texte;
+  return sans === '-0' ? '0' : sans;
 }
 
 /** alpha_6 = (rho_1 / 25)^0,5, borne a [1,0 ; 1,5], expression (8.10) et tableau 8.3. */
@@ -99,7 +101,7 @@ export function verifierRecouvrement(d: DonneesRecouvrement, profil: ProfilEc2):
 
   let alpha_3: OrigineCoefficient;
   if (d.sollicitation === 'compression') {
-    alpha_3 = { statut: 'fixe-par-la-norme', valeur: 1, motif: 'barre comprimee : 1,0 (tableau 8.2)' };
+    alpha_3 = { statut: 'fixe-par-la-norme', valeur: 1, motif: 'barre comprimee : 1 (tableau 8.2)' };
   } else if (d.confinement === null) {
     alpha_3 = { statut: 'non-applicable', motif: 'aucune armature transversale prise en compte' };
   } else {
@@ -112,7 +114,7 @@ export function verifierRecouvrement(d: DonneesRecouvrement, profil: ProfilEc2):
     alpha_3 = {
       statut: 'calcule',
       valeur: Math.min(1, Math.max(0.7, brut)),
-      detail: `Sigma A_st,min = A_s sigma_sd / f_yd = ${fr(min, 0)} mm2 ; 1 - K lambda = ${fr(brut, 3)}, borne a [0,7 ; 1,0]`,
+      detail: `Sigma A_st,min = A_s sigma_sd / f_yd = ${fr(min, 0)} mm2 ; 1 - K lambda = ${fr(brut, 3)}, borne a [0,7 ; 1]`,
     };
   }
 

@@ -15,9 +15,11 @@ import type {
 } from '../domaines/resultat';
 import { exigerPositifOuNul } from '../norms/profil';
 
-/** Nombre a la francaise pour les motifs affiches. */
+/** Nombre a la francaise pour les motifs affiches : sans zeros inutiles de fin. */
 function fr(x: number, d: number): string {
-  return x.toFixed(d).replace('.', ',');
+  const texte = x.toFixed(d).replace('.', ',');
+  const sans = texte.includes(',') ? texte.replace(/,?0+$/, '') : texte;
+  return sans === '-0' ? '0' : sans;
 }
 
 const BORNE_BASSE = 0.7;
@@ -93,15 +95,15 @@ export function valeurDe(o: OrigineCoefficient): number {
 export function coefficientsAlpha(e: EntreesAlphas): Record<NomAlpha, OrigineCoefficient> {
   const droite = e.forme === 'droite';
   const comprime = e.sollicitation === 'compression';
-  const motifC = 'barre comprimee : 1,0 (tableau 8.2)';
+  const motifC = 'barre comprimee : 1 (tableau 8.2)';
 
   const alpha_1: OrigineCoefficient = comprime
     ? { statut: 'fixe-par-la-norme', valeur: 1, motif: motifC }
     : droite
-      ? { statut: 'fixe-par-la-norme', valeur: 1, motif: 'barre droite : 1,0 (tableau 8.2)' }
+      ? { statut: 'fixe-par-la-norme', valeur: 1, motif: 'barre droite : 1 (tableau 8.2)' }
       : e.c_d > 3 * e.phi
         ? { statut: 'calcule', valeur: 0.7, detail: `c_d = ${e.c_d} mm > 3 phi = ${3 * e.phi} mm : 0,7` }
-        : { statut: 'calcule', valeur: 1, detail: `c_d = ${e.c_d} mm <= 3 phi = ${3 * e.phi} mm : 1,0` };
+        : { statut: 'calcule', valeur: 1, detail: `c_d = ${e.c_d} mm <= 3 phi = ${3 * e.phi} mm : 1` };
 
   let alpha_2: OrigineCoefficient;
   if (comprime) {
@@ -112,7 +114,7 @@ export function coefficientsAlpha(e: EntreesAlphas): Record<NomAlpha, OrigineCoe
     alpha_2 = {
       statut: 'calcule',
       valeur: borner(brut),
-      detail: `1 - 0,15 (c_d - ${droite ? 'phi' : '3 phi'}) / phi = ${fr(brut, 3)}, borne a [0,7 ; 1,0]`,
+      detail: `1 - 0,15 (c_d - ${droite ? 'phi' : '3 phi'}) / phi = ${fr(brut, 3)}, borne a [0,7 ; 1]`,
     };
   }
 
@@ -126,7 +128,7 @@ export function coefficientsAlpha(e: EntreesAlphas): Record<NomAlpha, OrigineCoe
     alpha_3 = {
       statut: 'calcule',
       valeur: borner(brut),
-      detail: `1 - K lambda = 1 - ${e.confinement.K} x ${fr(e.confinement.lambda, 3)} = ${fr(brut, 3)}, borne a [0,7 ; 1,0]`,
+      detail: `1 - K lambda = 1 - ${e.confinement.K} x ${fr(e.confinement.lambda, 3)} = ${fr(brut, 3)}, borne a [0,7 ; 1]`,
     };
   }
 
@@ -141,7 +143,7 @@ export function coefficientsAlpha(e: EntreesAlphas): Record<NomAlpha, OrigineCoe
     alpha_5 = { statut: 'non-applicable', motif: 'aucune pression transversale declaree' };
   } else {
     const brut = 1 - 0.04 * e.p;
-    alpha_5 = { statut: 'calcule', valeur: borner(brut), detail: `1 - 0,04 p = ${fr(brut, 3)}, borne a [0,7 ; 1,0]` };
+    alpha_5 = { statut: 'calcule', valeur: borner(brut), detail: `1 - 0,04 p = ${fr(brut, 3)}, borne a [0,7 ; 1]` };
   }
 
   return { alpha_1, alpha_2, alpha_3, alpha_4, alpha_5 };

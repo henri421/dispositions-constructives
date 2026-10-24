@@ -15,9 +15,11 @@ import { fyd, tractionPourAdherence } from '../materiaux/materiaux';
 import { conditionsAdherence, contrainteAdherence, eta1, eta2 } from './adherence';
 import { aireBarre, coefficientsAlpha, confinementAncrage, enrobageEquivalent, produitBorne, valeurDe } from './coefficients';
 
-/** Nombre a la francaise pour les motifs affiches. */
+/** Nombre a la francaise pour les motifs affiches : sans zeros inutiles de fin. */
 function fr(x: number, d: number): string {
-  return x.toFixed(d).replace('.', ',');
+  const texte = x.toFixed(d).replace('.', ',');
+  const sans = texte.includes(',') ? texte.replace(/,?0+$/, '') : texte;
+  return sans === '-0' ? '0' : sans;
 }
 
 /** Diametre equivalent maximal d'un paquet, §8.9.1(2) (mm). */
