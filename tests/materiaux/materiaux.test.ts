@@ -38,7 +38,7 @@ describe('materiaux', () => {
   it('profil : une valeur sans source bloque', () => {
     const p = ec2Recommande();
     p.gamma_C = { valeur: 1.5, source: ' ' };
-    expect(() => verifierProfil(p)).toThrow('n a pas de source');
+    expect(() => verifierProfil(p)).toThrow("n'a pas de source");
     expect(() => verifierProfil(P)).not.toThrow();
   });
 

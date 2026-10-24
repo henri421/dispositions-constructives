@@ -86,7 +86,7 @@ describe('methode simplifiee, §8.4.4(2)', () => {
 
   it('refusee en compression et pour une barre droite sans soudure', () => {
     expect(() => verifierAncrage(donneesBase({ methode: 'simplifiee', sollicitation: 'compression' }), P)).toThrow('traction');
-    expect(() => verifierAncrage(donneesBase({ methode: 'simplifiee' }), P)).toThrow('methode generale');
+    expect(() => verifierAncrage(donneesBase({ methode: 'simplifiee' }), P)).toThrow('méthode générale');
   });
 });
 
@@ -114,7 +114,7 @@ describe('contrainte sigma_sd, trois modes', () => {
   });
 
   it('refus : sigma_sd > f_yd, A_s,req > A_s,prov', () => {
-    expect(() => contrainteOrigine({ mode: 'saisie', sigma_sd: 500 }, 434.78)).toThrow('depasse f_yd');
+    expect(() => contrainteOrigine({ mode: 'saisie', sigma_sd: 500 }, 434.78)).toThrow('dépasse f_yd');
     expect(() => contrainteOrigine({ mode: 'reduite', A_s_req: 250, A_s_prov: 200 }, 434.78)).toThrow('A_s,req');
   });
 });
@@ -130,7 +130,7 @@ describe('paquets de barres, §8.9', () => {
   });
 
   it('n_b limite a 3, ou 4 pour des barres verticales comprimees et les recouvrements', () => {
-    expect(() => diametreEquivalent(12, { nb: 4, verticalesComprimees: false }, false)).toThrow('limite a 3');
+    expect(() => diametreEquivalent(12, { nb: 4, verticalesComprimees: false }, false)).toThrow('limité à 3');
     expect(diametreEquivalent(12, { nb: 4, verticalesComprimees: true }, false)).toBe(24);
     expect(diametreEquivalent(12, { nb: 4, verticalesComprimees: false }, true)).toBe(24);
   });

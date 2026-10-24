@@ -50,7 +50,7 @@ describe('vues', () => {
 
   it('les lignes de l ancrage disent si la borne 0,7 est activee', () => {
     const r = verifierAncrage(donneesBase({ a: 120, c1: 60, c: 60, confinement: { ...CONFINEMENT_POUTRE, sommeAst: 1000 }, pressionTransversale: 10 }), P);
-    expect(lignesAncrage(r).some((l) => l.libelle.includes('ACTIVEE'))).toBe(true);
+    expect(lignesAncrage(r).some((l) => l.libelle.includes('ACTIVÉE'))).toBe(true);
   });
 
   it('le bloc du verdict de la note porte le meme constat que l ecran, et son motif', () => {
@@ -62,14 +62,14 @@ describe('vues', () => {
 
   it('les lignes du recouvrement disent que alpha_4 n intervient pas', () => {
     const r = verifierRecouvrement(donneesRecouvrement(), P);
-    expect(lignesRecouvrement(r).find((l) => l.symbole === 'alpha_4')?.libelle).toContain('n intervient pas');
+    expect(lignesRecouvrement(r).find((l) => l.symbole === 'alpha_4')?.libelle).toContain("n'intervient pas");
   });
 });
 
 describe('croquis et export', () => {
   it('croquis d ancrage cote, sans NaN', () => {
     const svg = croquisAncrage(verifierAncrage(donneesBase(), P), 'coude-ou-crochet', true);
-    expect(svg).toContain('l_bd = 561 mm');
+    expect(svg).toContain('l<tspan dy="0.4em" font-size="75%">bd</tspan><tspan dy="-0.3em"> = 561 mm</tspan>');
     expect(svg).toContain('class="transversale"');
     expect(svg).not.toContain('NaN');
   });

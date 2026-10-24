@@ -52,7 +52,7 @@ describe('coefficients alpha, tableau 8.2', () => {
   it('en COMPRESSION : alpha_1, alpha_2, alpha_3 fixes a 1,0 ; alpha_5 non applicable, pas egal a 1', () => {
     const a = coefficientsAlpha({ ...base, sollicitation: 'compression', c_d: 80, confinement: { lambda: 2, K: 0.1 }, p: 5 });
     for (const nom of ['alpha_1', 'alpha_2', 'alpha_3'] as const) {
-      expect(a[nom]).toEqual({ statut: 'fixe-par-la-norme', valeur: 1, motif: 'barre comprimee : 1,0 (tableau 8.2)' });
+      expect(a[nom]).toEqual({ statut: 'fixe-par-la-norme', valeur: 1, motif: 'barre comprimée : 1 (tableau 8.2)' });
     }
     expect(a.alpha_5.statut).toBe('non-applicable');
   });

@@ -31,7 +31,7 @@ describe('conditions d adherence, figure 8.2', () => {
   });
 
   it('refuse une barre hors de l element', () => {
-    expect(() => geo(0, 500, 600)).toThrow('depasse');
+    expect(() => geo(0, 500, 600)).toThrow('dépasse');
   });
 });
 
