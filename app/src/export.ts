@@ -60,11 +60,6 @@ export interface NoteDeCalcul {
   hypotheses: string[];
 }
 
-const AIDE_AU_CALCUL =
-  "Outil d'aide au calcul. Cet outil constate, il ne prescrit pas : il rend des longueurs, " +
-  "jamais un plan de ferraillage. La vérification finale et la responsabilité incombent à " +
-  "l'ingénieur du projet. Cette note est un compte rendu, pas une justification réglementaire signée.";
-
 const STYLE_NOTE = `
   body { margin: 0; padding: 24px 28px; background: var(--surface); color: var(--texte); font: 14px/1.5 var(--sans); }
   h1 { font-size: 1.1rem; font-weight: normal; letter-spacing: .02em; margin: 0 0 .2rem; }
@@ -81,7 +76,6 @@ const STYLE_NOTE = `
                    padding: .5rem .7rem; border-radius: var(--rayon); margin: .5rem 0; font-size: .82rem; }
   .dessin { margin: .6rem 0 1rem; page-break-inside: avoid; }
   .dessin svg { max-width: 100%; height: auto; }
-  .pied { margin-top: 2rem; padding-top: .6rem; border-top: 1px solid var(--bordure); color: var(--texte-doux); font-size: .78rem; }
   ul { margin: .3rem 0 .6rem; padding-left: 1.1rem; color: var(--texte-doux); font-size: .82rem; }
   @media print { body { background: #fff; padding: 0; } h2 { page-break-after: avoid; } }
 `;
@@ -123,6 +117,5 @@ ${avertissements}
 <h2>Croquis</h2>${dessins}
 <h2>Vérifications</h2>${note.resultats.map(tableDuBloc).join('')}
 ${hypotheses}
-<p class="pied">${AIDE_AU_CALCUL}</p>
 </body></html>`;
 }
