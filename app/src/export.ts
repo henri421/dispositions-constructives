@@ -1,18 +1,12 @@
 /**
- * Les sorties : SVG autonome, CSV et note de calcul.
+ * Les sorties : SVG autonome et CSV.
  *
- * Tout ici est PUR — aucun `document`. Le telechargement vit dans
- * `aedificium-ui` (`telecharger`, `ouvrirOuTelecharger`).
+ * Tout ici est PUR — aucun `document`. Le telechargement et la note de calcul
+ * vivent dans `aedificium-ui` (`telecharger`, `ouvrirOuTelecharger`,
+ * `noteDeCalculHtml`) ; le contenu de la note est bati par `note.ts`.
  */
 
-import { JETONS, notationHtml, notationTexte, type BlocResultat } from 'aedificium-ui';
-
-/** Hypotheses et limites rappelees dans la note de calcul. */
-export const HYPOTHESES_NOTE: string[] = [
-  "Valeurs recommandées de l'EN 1992-1-1 ; aucune annexe nationale codée.",
-  'Borne alpha_2 alpha_3 alpha_5 >= 0,7 appliquée aux ancrages et aux recouvrements.',
-  'Méthode simplifiée : l_b,eq porté à l_b,min, du côté de la sécurité.',
-];
+import { JETONS, notationTexte, type BlocResultat } from 'aedificium-ui';
 
 /** Copie des blocs ou tout le texte affiche passe en notation texte (CSV). */
 export function blocsEnTexte(blocs: readonly BlocResultat[]): BlocResultat[] {
@@ -48,74 +42,3 @@ svg .cote line { stroke: var(--texte); stroke-width: 1; }
 svg .cote text { fill: var(--texte); font-size: 13px; text-anchor: middle; font-family: var(--mono); }
 svg .petit { fill: var(--texte-doux); font-size: 11px; }
 svg .legende { fill: var(--texte-faible); font-size: 10px; }`;
-
-export interface NoteDeCalcul {
-  titre: string;
-  date: string;
-  profil: string;
-  entrees: BlocResultat[];
-  dessins: string[];
-  resultats: BlocResultat[];
-  avertissements: string[];
-  hypotheses: string[];
-}
-
-const STYLE_NOTE = `
-  body { margin: 0; padding: 24px 28px; background: var(--surface); color: var(--texte); font: 14px/1.5 var(--sans); }
-  h1 { font-size: 1.1rem; font-weight: normal; letter-spacing: .02em; margin: 0 0 .2rem; }
-  h2 { font-size: .95rem; font-weight: 600; margin: 1.6rem 0 .5rem; border-bottom: 1px solid var(--bordure); padding-bottom: .25rem; }
-  h3 { font-size: .8rem; font-weight: 600; margin: 1rem 0 .35rem; }
-  .date { color: var(--texte-faible); font-size: .8rem; margin: 0 0 1.2rem; }
-  table { border-collapse: collapse; width: 100%; margin: .3rem 0 .6rem; }
-  td { border-bottom: 1px solid var(--bordure-douce); padding: .25rem .4rem; vertical-align: top; }
-  td.sym { font-family: var(--mono); width: 8rem; background: var(--surface-appui); }
-  td.lib { color: var(--texte-doux); }
-  td.val { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
-  .note { color: var(--texte-doux); font-size: .8rem; margin: .2rem 0 .8rem; }
-  .avertissement { border-left: 3px solid var(--alerte); background: var(--alerte-fond); color: var(--alerte);
-                   padding: .5rem .7rem; border-radius: var(--rayon); margin: .5rem 0; font-size: .82rem; }
-  .dessin { margin: .6rem 0 1rem; page-break-inside: avoid; }
-  .dessin svg { max-width: 100%; height: auto; }
-  ul { margin: .3rem 0 .6rem; padding-left: 1.1rem; color: var(--texte-doux); font-size: .82rem; }
-  @media print { body { background: #fff; padding: 0; } h2 { page-break-after: avoid; } }
-`;
-
-function tableDuBloc(bloc: BlocResultat): string {
-  const lignes = bloc.lignes
-    .map(
-      (l) =>
-        `<tr><td class="sym">${notationHtml(l.symbole)}</td><td class="lib">${notationHtml(l.libelle)}</td><td class="val">${notationHtml(l.valeur)}</td></tr>`
-    )
-    .join('');
-  const table = lignes === '' ? '' : `<table>${lignes}</table>`;
-  // Le motif est rendu MEME sans ligne : c'est le cas ou il porte toute l'information.
-  const note = bloc.note === null ? '' : `<p class="note">${notationHtml(bloc.note)}</p>`;
-  return `<h3>${notationHtml(bloc.titre)}</h3>${table}${note}`;
-}
-
-/**
- * Note de calcul HTML autonome, imprimable en PDF. Elle porte les valeurs
- * intermediaires et le statut de chaque coefficient, et ne masque aucun
- * coefficient non applicable.
- */
-export function noteDeCalculHtml(note: NoteDeCalcul, styles: string): string {
-  const avertissements = note.avertissements.map((a) => `<p class="avertissement">${notationHtml(a)}</p>`).join('');
-  const dessins = note.dessins.map((svg) => `<div class="dessin">${svg}</div>`).join('');
-  const hypotheses =
-    note.hypotheses.length === 0
-      ? ''
-      : `<h2>Hypothèses et limites</h2><ul>${note.hypotheses.map((h) => `<li>${notationHtml(h)}</li>`).join('')}</ul>`;
-  return `<!doctype html>
-<html lang="fr"><head><meta charset="utf-8" />
-<title>Note de calcul — ${notationHtml(note.titre)}</title>
-<style>${styles}${STYLE_NOTE}</style></head>
-<body>
-<h1>Note de calcul — ancrages et recouvrements (EN 1992-1-1 §8)</h1>
-<p class="date">${notationHtml(note.titre)} · ${notationHtml(note.date)} · profil : ${notationHtml(note.profil)}</p>
-${avertissements}
-<h2>Données d'entrée</h2>${note.entrees.map(tableDuBloc).join('')}
-<h2>Croquis</h2>${dessins}
-<h2>Vérifications</h2>${note.resultats.map(tableDuBloc).join('')}
-${hypotheses}
-</body></html>`;
-}

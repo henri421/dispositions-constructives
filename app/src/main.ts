@@ -5,7 +5,15 @@
  * a `form`, `vue`, `croquis` et `export` — tous purs — la mise en forme.
  */
 
-import { notationTexte, ouvrirOuTelecharger, resultatsEnCsv, svgAutonome, telecharger, type BlocResultat } from 'aedificium-ui';
+import {
+  noteDeCalculHtml,
+  notationTexte,
+  ouvrirOuTelecharger,
+  resultatsEnCsv,
+  svgAutonome,
+  telecharger,
+  type BlocResultat,
+} from 'aedificium-ui';
 import {
   ec2Recommande,
   tableauParDiametre,
@@ -18,6 +26,7 @@ import {
 } from '../../src/index';
 import { champsDepuisModele, donneesAncrage, donneesRecouvrement, modeleDepuisChamps, modeleParDefaut, type ModeleSaisie } from './form';
 import { croquisAncrage, croquisRecouvrement } from './croquis';
+import { noteDuCalcul } from './note';
 import {
   avertissementsHtml,
   blocEntrees,
@@ -31,7 +40,7 @@ import {
   tableHtml,
   verdictHtml,
 } from './vue';
-import { HYPOTHESES_NOTE, STYLES_TRACE, blocsEnTexte, noteDeCalculHtml } from './export';
+import { STYLES_TRACE, blocsEnTexte } from './export';
 import './style.css';
 
 function exige<T extends Element>(selecteur: string): T {
@@ -41,7 +50,35 @@ function exige<T extends Element>(selecteur: string): T {
 }
 
 const PROFIL = ec2Recommande();
+const CLE_CARTOUCHE = 'dispositions-constructives:cartouche';
 const formulaire = exige<HTMLFormElement>('#formulaire');
+const sorties = exige<HTMLElement>('#sorties');
+const champProjet = exige<HTMLInputElement>('[data-role="projet"]');
+const champElement = exige<HTMLInputElement>('[data-role="element"]');
+
+/** Cartouche enregistre : toute valeur absente ou illisible vaut chaine vide. */
+function lireCartouche(): { projet: string; element: string } {
+  try {
+    const brut: unknown = JSON.parse(localStorage.getItem(CLE_CARTOUCHE) ?? 'null');
+    if (brut === null || typeof brut !== 'object') return { projet: '', element: '' };
+    const o = brut as Record<string, unknown>;
+    return {
+      projet: typeof o.projet === 'string' ? o.projet : '',
+      element: typeof o.element === 'string' ? o.element : '',
+    };
+  } catch {
+    return { projet: '', element: '' };
+  }
+}
+
+function enregistrerCartouche(): void {
+  try {
+    localStorage.setItem(CLE_CARTOUCHE, JSON.stringify({ projet: champProjet.value, element: champElement.value }));
+  } catch {
+    // Stockage indisponible : le cartouche reste valable pour la note courante.
+  }
+}
+
 const zones = {
   erreurSaisie: exige<HTMLElement>('[data-role="erreur-saisie"]'),
   erreur: exige<HTMLElement>('[data-role="erreur"]'),
@@ -189,21 +226,14 @@ document.addEventListener('click', (ev) => {
   } else if (action === 'exporter-resultats') {
     telecharger(`${base}.csv`, resultatsEnCsv(blocsEnTexte([blocEntrees(e.modele), ...e.lignes])), 'text/csv;charset=utf-8');
   } else if (action === 'exporter-note') {
-    const avert =
-      e.resultat === null ? [] : e.resultat.type === 'ancrage' ? e.resultat.r.avertissements : e.resultat.r.ancrage.avertissements;
     ouvrirOuTelecharger(
       `${base}-note.html`,
       noteDeCalculHtml(
-        {
-          titre: `${e.modele.mode === 'ancrage' ? 'Ancrage' : 'Recouvrement'} HA${e.modele.phi}`,
+        noteDuCalcul(PROFIL, e.modele, {
+          projet: champProjet.value,
+          element: champElement.value,
           date: new Date().toISOString().slice(0, 10),
-          profil: `${PROFIL.nom} (${PROFIL.date})`,
-          entrees: [blocEntrees(e.modele)],
-          dessins: e.croquis === '' ? [] : [e.croquis],
-          resultats: e.lignes,
-          avertissements: avert,
-          hypotheses: HYPOTHESES_NOTE,
-        },
+        }),
         STYLES_TRACE
       )
     );
@@ -213,6 +243,11 @@ document.addEventListener('click', (ev) => {
 ecrireModele(modeleParDefaut());
 formulaire.addEventListener('input', rafraichir);
 formulaire.addEventListener('change', rafraichir);
+const cartouche = lireCartouche();
+champProjet.value = cartouche.projet;
+champElement.value = cartouche.element;
+// Hors formulaire : un changement de cartouche ne relance pas le calcul.
+sorties.addEventListener('input', enregistrerCartouche);
 rafraichir();
 
 if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
