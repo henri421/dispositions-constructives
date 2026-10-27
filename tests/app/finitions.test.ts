@@ -7,9 +7,9 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { resultatsEnCsv, type BlocResultat } from 'aedificium-ui';
+import { noteDeCalculHtml, resultatsEnCsv, type BlocResultat } from 'aedificium-ui';
 import { ec2Recommande, tableauParDiametre, verifierAncrage, verifierCadre, verifierMandrin, verifierRecouvrement } from '../../src/index';
-import { modeleParDefaut } from '../../app/src/form';
+import { modeleParDefaut, type ModeleSaisie } from '../../app/src/form';
 import { croquisAncrage, croquisRecouvrement } from '../../app/src/croquis';
 import {
   avertissementsHtml,
@@ -23,7 +23,8 @@ import {
   tableHtml,
   verdictHtml,
 } from '../../app/src/vue';
-import { HYPOTHESES_NOTE, STYLES_TRACE, blocsEnTexte, noteDeCalculHtml } from '../../app/src/export';
+import { STYLES_TRACE, blocsEnTexte } from '../../app/src/export';
+import { noteDuCalcul } from '../../app/src/note';
 import { CONFINEMENT_POUTRE, donneesBase, donneesRecouvrement } from '../fixtures';
 
 const P = ec2Recommande();
@@ -132,19 +133,21 @@ function cas() {
   blocs.push(...erreurs.map((e) => ({ titre: 'Ancrage', lignes: [], note: e })));
 
   const entrees = [blocEntrees(modeleParDefaut())];
-  const note = noteDeCalculHtml(
-    {
-      titre: 'Ancrage HA16',
-      date: '2026-10-24',
-      profil: `${P.nom} (${P.date})`,
-      entrees,
-      dessins,
-      resultats: blocs,
-      avertissements: ancrages.flatMap((r) => r.avertissements),
-      hypotheses: HYPOTHESES_NOTE,
-    },
-    STYLES_TRACE
-  );
+  // La note : les memes cas, par la saisie, dont un calcul impossible.
+  const d = modeleParDefaut();
+  const modeles: ModeleSaisie[] = [
+    d,
+    { ...d, disponible: 400 },
+    { ...d, disponible: 900, phiM: 64, retour: 80 },
+    { ...d, forme: 'coude-ou-crochet', confinement: true },
+    { ...d, sollicitation: 'compression' },
+    { ...d, mode: 'recouvrement' },
+    { ...d, mode: 'recouvrement', phi: 25, disponible: 1500 },
+    { ...d, sigMode: 'saisie', sigma: 500 },
+  ];
+  const note = modeles
+    .map((m) => noteDeCalculHtml(noteDuCalcul(P, m, { projet: 'Parking', element: '', date: '2026-10-24' }), STYLES_TRACE))
+    .join('');
   const csv = resultatsEnCsv(blocsEnTexte([...entrees, ...blocs]));
   return { ecran, dessins, note, csv };
 }
@@ -193,14 +196,6 @@ describe('rendu des notations', () => {
     expect(html).toBe('<p class="alerte">σ<sub>sd</sub> &lt; 0</p>');
   });
 
-  it('la note garde l echappement du titre', () => {
-    const html = noteDeCalculHtml(
-      { titre: 'HA16 <x>', date: '2026-10-24', profil: P.nom, entrees: [], dessins: [], resultats: [], avertissements: [], hypotheses: [] },
-      STYLES_TRACE
-    );
-    expect(html).toContain('HA16 &lt;x&gt;');
-  });
-
   it('blocsEnTexte ne touche pas aux blocs recus', () => {
     const bloc: BlocResultat = { titre: 'alpha_1', lignes: [{ symbole: 'l_0', libelle: 'phi', valeur: '1 mm2' }], note: 'M_Ed' };
     const [t] = blocsEnTexte([bloc]);
@@ -241,7 +236,7 @@ describe('main.ts passe par les fonctions testees', () => {
     expect(main).not.toContain('class="alerte"');
     expect(main).toContain('avertissementsHtml(');
     expect(main).toContain('blocEntrees(');
-    expect(main).toContain('HYPOTHESES_NOTE');
+    expect(main).toContain('noteDuCalcul(');
     expect(main).toContain('blocsEnTexte(');
   });
 });

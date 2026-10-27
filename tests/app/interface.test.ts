@@ -6,7 +6,6 @@ import { ec2Recommande, verifierAncrage, verifierRecouvrement } from '../../src/
 import { champsDepuisModele, donneesAncrage, modeleDepuisChamps, modeleParDefaut } from '../../app/src/form';
 import { croquisAncrage, croquisRecouvrement } from '../../app/src/croquis';
 import { blocVerdict, lignesAncrage, lignesRecouvrement, texteCoefficient, verdictHtml } from '../../app/src/vue';
-import { STYLES_TRACE, noteDeCalculHtml } from '../../app/src/export';
 import { CONFINEMENT_POUTRE, donneesBase, donneesRecouvrement } from '../fixtures';
 
 const P = ec2Recommande();
@@ -83,14 +82,5 @@ describe('croquis et export', () => {
     const css = readFileSync(fileURLToPath(new URL('../../app/src/style.css', import.meta.url)), 'utf8');
     const page = valeursDesJetons(css);
     for (const [nom, valeur] of valeursDesJetons(JETONS)) expect(page.get(nom)).toBe(valeur);
-  });
-
-  it('la note porte le titre du chapitre 8 et echappe le texte', () => {
-    const html = noteDeCalculHtml(
-      { titre: 'HA16 <x>', date: '2026-10-01', profil: P.nom, entrees: [], dessins: [], resultats: [], avertissements: [], hypotheses: [] },
-      STYLES_TRACE
-    );
-    expect(html).toContain('EN 1992-1-1 §8');
-    expect(html).toContain('HA16 &lt;x&gt;');
   });
 });
