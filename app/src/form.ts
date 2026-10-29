@@ -5,7 +5,8 @@
  * Unites : mm, mm2, MPa, kN, degres.
  */
 
-import { lireNombre } from 'aedificium-ui';
+import { langueCourante, lireNombre } from 'aedificium-ui';
+import { textes } from './textes';
 import type {
   DonneesAncrage,
   DonneesRecouvrement,
@@ -102,42 +103,19 @@ export function modeleParDefaut(): ModeleSaisie {
   };
 }
 
-const LIBELLES: Record<string, string> = {
-  phi: 'phi (mm)',
-  nb: 'n_b (-)',
-  fck: 'f_ck (MPa)',
-  fyk: 'f_yk (MPa)',
-  inclinaison: 'Inclinaison (degrés)',
-  h_element: "Hauteur de l'élément (mm)",
-  z_fond: 'Distance au fond (mm)',
-  sigma: 'sigma_sd (MPa)',
-  as_req: 'A_s,req (mm2)',
-  as_prov: 'A_s,prov (mm2)',
-  a: 'a (mm)',
-  c1: 'c_1 (mm)',
-  c: 'c (mm)',
-  somme_ast: 'Sigma A_st (mm2)',
-  p: 'p (MPa)',
-  disponible: 'Longueur disponible (mm)',
-  rho1: 'rho_1 (%)',
-  a_rec: 'Distance entre recouvrements (mm)',
-  phi_m: 'Mandrin phi_m (mm)',
-  phi_cadre: 'phi du cadre (mm)',
-  retour: 'Retour droit (mm)',
-};
 
 class ErreurDeSaisie extends Error {}
 
 function choix<T extends string>(v: Record<string, string>, nom: string, permis: readonly T[]): T {
   const x = v[nom];
   if ((permis as readonly string[]).includes(x)) return x as T;
-  throw new ErreurDeSaisie(`Valeur inattendue pour ${nom} : « ${x ?? ''} ».`);
+  throw new ErreurDeSaisie(textes().saisie.valeurInattendue(nom, x ?? ''));
 }
 
 function nombre(v: Record<string, string>, nom: string, requis: boolean, repli: number): number {
   const x = lireNombre(v[nom] ?? '');
   if (x === null) {
-    if (requis) throw new ErreurDeSaisie(`${LIBELLES[nom] ?? nom} : nombre attendu.`);
+    if (requis) throw new ErreurDeSaisie(textes().saisie.nombreAttendu(textes().saisie.libelles[nom] ?? nom));
     return repli;
   }
   return x;
@@ -147,7 +125,7 @@ function nombreOuVide(v: Record<string, string>, nom: string): number | null {
   const t = (v[nom] ?? '').trim();
   if (t === '') return null;
   const x = lireNombre(t);
-  if (x === null) throw new ErreurDeSaisie(`${LIBELLES[nom] ?? nom} : nombre attendu, ou champ vide.`);
+  if (x === null) throw new ErreurDeSaisie(textes().saisie.nombreOuVide(textes().saisie.libelles[nom] ?? nom));
   return x;
 }
 
@@ -208,7 +186,7 @@ export function modeleDepuisChamps(v: Record<string, string>): Lecture {
 }
 
 export function champsDepuisModele(m: ModeleSaisie): Record<string, string> {
-  const n = (x: number): string => String(x).replace('.', ',');
+  const n = (x: number): string => String(x).replace('.', langueCourante() === 'en' ? '.' : ',');
   const nv = (x: number | null): string => (x === null ? '' : n(x));
   const c = (x: boolean): string => (x ? 'oui' : 'non');
   return {

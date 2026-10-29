@@ -6,6 +6,8 @@
  */
 
 import {
+  definirLangue,
+  langueDuDocument,
   noteDeCalculHtml,
   notationTexte,
   ouvrirOuTelecharger,
@@ -41,11 +43,14 @@ import {
   verdictHtml,
 } from './vue';
 import { STYLES_TRACE, blocsEnTexte } from './export';
+import { phrase, textes } from './textes';
 import './style.css';
+
+definirLangue(langueDuDocument(document));
 
 function exige<T extends Element>(selecteur: string): T {
   const trouve = document.querySelector(selecteur);
-  if (trouve === null) throw new Error(`élément absent de la page : ${selecteur}`);
+  if (trouve === null) throw new Error(textes().messages.elementAbsent(selecteur));
   return trouve as T;
 }
 
@@ -165,7 +170,7 @@ function rafraichir(): void {
       zones.avertissements.innerHTML = avertissementsHtml(r.avertissements);
       const lignes = lignesAncrage(r);
       zones.corps.innerHTML = tableHtml(lignes);
-      blocs.push({ titre: 'Ancrage (§8.4)', lignes, note: null }, blocVerdict(r.verdict, r.motif));
+      blocs.push({ titre: textes().blocs.ancrage, lignes, note: null }, blocVerdict(r.verdict, r.motif));
     } else {
       const r = verifierRecouvrement(donneesRecouvrement(m), PROFIL);
       resultat = { type: 'recouvrement', r };
@@ -177,8 +182,8 @@ function rafraichir(): void {
       const lignes = lignesRecouvrement(r);
       zones.corps.innerHTML = tableHtml([...base, ...lignes]);
       blocs.push(
-        { titre: 'Adhérence et longueur de référence (§8.4)', lignes: base, note: null },
-        { titre: 'Recouvrement (§8.7)', lignes, note: r.armatureDeCouture.requise ? r.armatureDeCouture.repartition : null },
+        { titre: textes().blocs.adherence, lignes: base, note: null },
+        { titre: textes().blocs.recouvrement, lignes, note: r.armatureDeCouture.requise ? phrase(r.armatureDeCouture.repartition) : null },
         blocVerdict(r.verdict, r.motif)
       );
     }
@@ -186,7 +191,7 @@ function rafraichir(): void {
     montrer(zones.erreur, null);
   } catch (e) {
     montrer(zones.erreur, messageDErreur(e));
-    blocs.push({ titre: m.mode === 'ancrage' ? 'Ancrage' : 'Recouvrement', lignes: [], note: messageDErreur(e) });
+    blocs.push({ titre: m.mode === 'ancrage' ? textes().blocs.ancrageSeul : textes().blocs.recouvrementSeul, lignes: [], note: messageDErreur(e) });
   }
 
   try {
@@ -194,12 +199,12 @@ function rafraichir(): void {
     const cadre = verifierCadre(m.phiCadre, m.typeCadre, PROFIL, m.retour);
     const lignes = lignesMandrinEtCadre(mandrin, cadre);
     zones.mandrins.innerHTML = tableHtml(lignes);
-    blocs.push({ titre: 'Mandrins et cadres (§8.3, §8.5)', lignes, note: null });
+    blocs.push({ titre: textes().blocs.mandrins, lignes, note: null });
     montrer(zones.erreurMandrin, null);
   } catch (e) {
     montrer(zones.erreurMandrin, messageDErreur(e));
     // L'ecran affiche l'erreur : la note la porte aussi, plutot qu'un silence.
-    blocs.push({ titre: 'Mandrins et cadres (§8.3, §8.5)', lignes: [], note: messageDErreur(e) });
+    blocs.push({ titre: textes().blocs.mandrins, lignes: [], note: messageDErreur(e) });
   }
 
   const synthese = tableauParDiametre(donneesAncrage({ ...m, mode: 'ancrage' }), PROFIL, m.rho1);
@@ -219,7 +224,7 @@ document.addEventListener('click', (ev) => {
   const base = `${e.modele.mode}-HA${e.modele.phi}`;
   if (action === 'exporter-croquis') {
     if (e.croquis === '') {
-      montrer(zones.erreur, 'Aucun croquis valide à exporter : corriger la saisie.');
+      montrer(zones.erreur, textes().messages.aucunCroquis);
       return;
     }
     telecharger(`${base}.svg`, svgAutonome(e.croquis, STYLES_TRACE), 'image/svg+xml;charset=utf-8');

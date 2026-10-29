@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="theme-color" content="#f7f7f6" />
+    <link rel="icon" href="../icone.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="../icone-192.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Detailing — anchorage and lap lengths, EN 1992-1-1 Section 8</title>
+  </head>
+  <body>
+    <nav class="barre" aria-label="suite of tools">
+      <div class="barre-corps">
+        <span class="barre-nom">Aedificium &middot; Reinforced concrete</span>
+        <div class="barre-actions">
+          <a class="barre-lien" href="https://henri421.github.io/WebAedificium/" target="_blank" rel="noopener">Aedificium suite &#8599;</a>
+          <a class="barre-langue" href="../" hreflang="fr" lang="fr" aria-label="Version française">FR</a>
+        </div>
+      </div>
+    </nav>
+
+    <header>
+      <h1>Detailing</h1>
+      <p class="sous-titre">
+        Anchorage and lap lengths of reinforcement, transverse reinforcement at laps, bundled bars, mandrels and
+        anchorage of links — EN 1992-1-1:2004, Section 8. Recommended values, no National Annex.
+      </p>
+      <p class="avertissement">
+        Bond conditions are never assumed: declare them or give the casting position.
+      </p>
+    </header>
+
+    <main>
+      <section id="saisie" aria-label="input">
+        <form id="formulaire" autocomplete="off">
+          <fieldset>
+            <legend>Object</legend>
+            <label><span>Calculation</span>
+              <select data-champ="mode">
+                <option value="ancrage">anchorage (8.4)</option>
+                <option value="recouvrement">lap (8.7)</option>
+              </select>
+            </label>
+            <label><span>Action</span>
+              <select data-champ="sollicitation">
+                <option value="traction">tension</option>
+                <option value="compression">compression</option>
+              </select>
+            </label>
+            <label><span>Available length (mm), optional</span><input type="text" inputmode="decimal" data-champ="disponible" placeholder="finding only" /></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Bar and materials</legend>
+            <label><span>&phi; (mm)</span><input type="text" inputmode="decimal" data-champ="phi" /></label>
+            <label class="case"><input type="checkbox" data-champ="paquet" /><span>bundle of bars (8.9)</span></label>
+            <div class="groupe" data-groupe="paquet">
+              <label><span>n<sub>b</sub> (-)</span><input type="text" inputmode="decimal" data-champ="nb" /></label>
+              <label class="case"><input type="checkbox" data-champ="verticales" /><span>vertical bars in compression</span></label>
+            </div>
+            <label><span>f<sub>ck</sub> (MPa)</span><input type="text" inputmode="decimal" data-champ="fck" /></label>
+            <label><span>f<sub>yk</sub> (MPa)</span><input type="text" inputmode="decimal" data-champ="fyk" /></label>
+            <label><span>&sigma;<sub>sd</sub> at the origin</span>
+              <select data-champ="sig_mode">
+                <option value="f_yd">fyd (conservative)</option>
+                <option value="saisie">entered</option>
+                <option value="reduite">fyd As,req / As,prov</option>
+              </select>
+            </label>
+            <div class="groupe" data-groupe="sig-saisie">
+              <label><span>&sigma;<sub>sd</sub> (MPa)</span><input type="text" inputmode="decimal" data-champ="sigma" /></label>
+            </div>
+            <div class="groupe" data-groupe="sig-reduite">
+              <label><span>A<sub>s,req</sub> (mm&sup2;)</span><input type="text" inputmode="decimal" data-champ="as_req" /></label>
+              <label><span>A<sub>s,prov</sub> (mm&sup2;)</span><input type="text" inputmode="decimal" data-champ="as_prov" /></label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Bond (Figure 8.2)</legend>
+            <label><span>Conditions</span>
+              <select data-champ="adh_mode">
+                <option value="declarees">declared</option>
+                <option value="geometrie">derived from the casting position</option>
+              </select>
+            </label>
+            <div class="groupe" data-groupe="adh-declarees">
+              <label><span>Bond conditions</span>
+                <select data-champ="conditions">
+                  <option value="mauvaises">poor (η₁ = 0.7)</option>
+                  <option value="bonnes">good (η₁ = 1)</option>
+                </select>
+              </label>
+            </div>
+            <div class="groupe" data-groupe="adh-geometrie">
+              <label><span>Inclination of the bar (&deg;)</span><input type="text" inputmode="decimal" data-champ="inclinaison" /></label>
+              <label><span>Cast height h (mm)</span><input type="text" inputmode="decimal" data-champ="h_element" /></label>
+              <label><span>Distance from the bar to the bottom (mm)</span><input type="text" inputmode="decimal" data-champ="z_fond" /></label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Bar end and cover (Figure 8.3)</legend>
+            <label><span>Shape</span>
+              <select data-champ="forme">
+                <option value="droite">straight</option>
+                <option value="coude-ou-crochet">bend or hook</option>
+                <option value="boucle">loop</option>
+              </select>
+            </label>
+            <label><span>a, clear spacing between bars (mm)</span><input type="text" inputmode="decimal" data-champ="a" /></label>
+            <label><span>c<sub>1</sub>, side cover (mm)</span><input type="text" inputmode="decimal" data-champ="c1" /></label>
+            <label><span>c, bottom cover (mm)</span><input type="text" inputmode="decimal" data-champ="c" /></label>
+            <div class="groupe" data-groupe="methode">
+              <label><span>Method</span>
+                <select data-champ="methode">
+                  <option value="generale">general 8.4.4(1)</option>
+                  <option value="simplifiee">simplified equivalent length 8.4.4(2)</option>
+                </select>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Confinement</legend>
+            <label class="case"><input type="checkbox" data-champ="confinement" /><span>non-welded transverse reinforcement</span></label>
+            <div class="groupe" data-groupe="confinement">
+              <label><span>Member</span>
+                <select data-champ="type_element">
+                  <option value="poutre">beam (Aₛₜ,min = 0.25 Aₛ)</option>
+                  <option value="dalle">slab (Aₛₜ,min = 0)</option>
+                </select>
+              </label>
+              <label><span>&Sigma;A<sub>st</sub> along l<sub>bd</sub> (mm&sup2;)</span><input type="text" inputmode="decimal" data-champ="somme_ast" /></label>
+              <label><span>Position (Figure 8.4)</span>
+                <select data-champ="position">
+                  <option value="angle">bar in the corner (K = 0.1)</option>
+                  <option value="courant">along a leg (K = 0.05)</option>
+                  <option value="exterieur">transverse bars outside (K = 0)</option>
+                </select>
+              </label>
+            </div>
+            <label class="case"><input type="checkbox" data-champ="soudees" /><span>welded transverse bars (Figure 8.1 e)</span></label>
+            <label><span>Transverse pressure p (MPa)</span><input type="text" inputmode="decimal" data-champ="p" /></label>
+          </fieldset>
+
+          <fieldset class="groupe" data-groupe="recouvrement">
+            <legend>Lap</legend>
+            <label><span>&rho;<sub>1</sub>, lapped bars in the section (%)</span><input type="text" inputmode="decimal" data-champ="rho1" /></label>
+            <label><span>Clear distance between laps (mm)</span><input type="text" inputmode="decimal" data-champ="a_rec" /></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Mandrel and links</legend>
+            <label><span>Mandrel of the bar &phi;<sub>m</sub> (mm), optional</span><input type="text" inputmode="decimal" data-champ="phi_m" placeholder="finding only" /></label>
+            <label><span>&phi; of the link (mm)</span><input type="text" inputmode="decimal" data-champ="phi_cadre" /></label>
+            <label><span>Anchorage of the link</span>
+              <select data-champ="type_cadre">
+                <option value="crochet">hook &ge; 135&deg;</option>
+                <option value="coude">bend 90&deg; to 135&deg;</option>
+              </select>
+            </label>
+            <label><span>Straight tail (mm), optional</span><input type="text" inputmode="decimal" data-champ="retour" placeholder="finding only" /></label>
+          </fieldset>
+          <p data-role="erreur-saisie" class="erreur" role="alert" hidden></p>
+        </form>
+      </section>
+
+      <div class="colonne">
+        <section id="resultat" aria-label="result">
+          <h2>Result</h2>
+          <p data-role="erreur" class="erreur" role="alert" hidden></p>
+          <div data-role="avertissements"></div>
+          <div data-role="verdict"></div>
+          <div data-role="croquis"></div>
+          <div data-role="corps"></div>
+        </section>
+
+        <section id="mandrins" aria-label="mandrels and links">
+          <h2>Mandrels and links (8.3, 8.5)</h2>
+          <p data-role="erreur-mandrin" class="erreur" role="alert" hidden></p>
+          <div data-role="mandrins-corps"></div>
+        </section>
+
+        <section id="synthese" aria-label="summary by diameter">
+          <h2>Summary by diameter</h2>
+          <p class="note">Same conditions as the input, for each common diameter. Lengths calculated, never copied from a table.</p>
+          <div class="defilement" data-role="synthese-corps"></div>
+        </section>
+
+        <section id="sorties" aria-label="outputs">
+          <h2>Outputs</h2>
+          <label><span>Project</span><input type="text" data-role="projet" /></label>
+          <label><span>Element</span><input type="text" data-role="element" placeholder="empty = object and diameter" /></label>
+          <div class="boutons">
+            <button type="button" data-action="exporter-croquis">Sketch (SVG)</button>
+            <button type="button" data-action="exporter-resultats">Results (CSV)</button>
+            <button type="button" data-action="exporter-note">Calculation note (printable HTML)</button>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      <p>
+        Out of scope: anchorage by welded transverse bars beyond the simplified method; anchorage of links by welded
+        bars (Figure 8.5 c and d); staggering of the anchorages of bundles (8.9.2); mechanical anchorage devices (8.8);
+        prestressing tendons (8.10); arrangement of laps (8.7.2), which belongs to the drawing.
+      </p>
+    </footer>
+
+    <script type="module" src="../src/main.ts"></script>
+  </body>
+</html>

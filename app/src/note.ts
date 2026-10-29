@@ -22,13 +22,10 @@ import {
 import { donneesAncrage, donneesRecouvrement, type ModeleSaisie } from './form';
 import { croquisAncrage, croquisRecouvrement } from './croquis';
 import { blocEntrees, blocSynthese, lignesAncrage, lignesMandrinEtCadre, lignesRecouvrement, messageDErreur } from './vue';
+import { phrase, textes } from './textes';
 
 /** Hypotheses et limites rappelees dans la note de calcul. */
-export const HYPOTHESES_NOTE: string[] = [
-  "Valeurs recommandées de l'EN 1992-1-1 ; aucune annexe nationale codée.",
-  'Borne alpha_2 alpha_3 alpha_5 >= 0,7 appliquée aux ancrages et aux recouvrements.',
-  'Méthode simplifiée : l_b,eq porté à l_b,min, du côté de la sécurité.',
-];
+export const HYPOTHESES_NOTE: string[] = textes().note.hypotheses;
 
 const aff = (v: number, d = 3): string => nombreAffiche(v, Math.min(d, 3));
 const L = (symbole: string, libelle: string, valeur: string): LigneResultat => ({ symbole, libelle, valeur });
@@ -38,13 +35,14 @@ type Principal = { type: 'ancrage'; r: ResultatAncrage } | { type: 'recouvrement
 
 /** Nom de l'element quand il n'est pas renseigne. */
 export function nomDeLElement(m: ModeleSaisie): string {
-  return `${m.mode === 'ancrage' ? 'Ancrage' : 'Recouvrement'} HA${aff(m.phi, 0)}`;
+  return textes().note.element(m.mode, aff(m.phi, 0));
 }
 
 function ligneContrainte(m: ModeleSaisie): LigneResultat {
-  if (m.sigMode === 'saisie') return L('sigma_sd', "contrainte à l'origine, saisie", `${aff(m.sigma, 1)} MPa`);
-  if (m.sigMode === 'reduite') return L('sigma_sd', "f_yd A_s,req / A_s,prov, contrainte à l'origine réduite", `A_s,req ${aff(m.asReq, 0)} mm2 ; A_s,prov ${aff(m.asProv, 0)} mm2`);
-  return L('sigma_sd', "contrainte à l'origine", 'f_yd');
+  const x = textes().note;
+  if (m.sigMode === 'saisie') return L('sigma_sd', x.sigmaSaisie, `${aff(m.sigma, 1)} MPa`);
+  if (m.sigMode === 'reduite') return L('sigma_sd', x.sigmaReduite, `A_s,req ${aff(m.asReq, 0)} mm2 ; A_s,prov ${aff(m.asProv, 0)} mm2`);
+  return L('sigma_sd', x.sigmaOrigine, 'f_yd');
 }
 
 /**
@@ -58,23 +56,26 @@ export function verificationsDeLaNote(
   mandrin: VerificationMandrin | null,
   cadre: VerificationCadre | null
 ): VerificationNote[] {
+  const x = textes().note;
   const v: VerificationNote[] = [];
   if (principal !== null && m.disponible !== null) {
     const requise = principal.type === 'ancrage' ? principal.r.l_bd : principal.r.l_0;
     v.push({
-      nom: principal.type === 'ancrage' ? "Longueur d'ancrage" : 'Longueur de recouvrement',
-      clause: principal.type === 'ancrage' ? '§8.4.4' : '§8.7.3',
+      nom: principal.type === 'ancrage' ? x.longueurAncrage : x.longueurRecouvrement,
+      clause: principal.type === 'ancrage' ? x.clauseAncrage : x.clauseRecouvrement,
       taux: requise / m.disponible,
       ok: principal.r.verdict === 'conforme',
     });
   }
-  if (mandrin !== null && mandrin.conforme !== null) v.push({ nom: 'Diamètre du mandrin', clause: '§8.3, tableau 8.1N', taux: null, ok: mandrin.conforme });
-  if (cadre !== null && cadre.conforme !== null) v.push({ nom: 'Ancrage des cadres', clause: '§8.5, figure 8.5', taux: null, ok: cadre.conforme });
+  if (mandrin !== null && mandrin.conforme !== null) v.push({ nom: x.diametreMandrin, clause: x.clauseMandrin, taux: null, ok: mandrin.conforme });
+  if (cadre !== null && cadre.conforme !== null) v.push({ nom: x.ancrageCadres, clause: x.clauseCadres, taux: null, ok: cadre.conforme });
   return v;
 }
 
 /** Note du calcul de la saisie `m`. */
 export function noteDuCalcul(profil: ProfilEc2, m: ModeleSaisie, cartouche: { projet: string; element: string; date: string }): NoteDeCalcul {
+  const t = textes();
+  const x = t.note;
   const [calcul, phi, materiaux, forme, enrobages] = blocEntrees(m).lignes;
   const calculs: ElementNote[] = [];
   const avertissements: string[] = [];
@@ -86,20 +87,20 @@ export function noteDuCalcul(profil: ProfilEc2, m: ModeleSaisie, cartouche: { pr
       const r = verifierAncrage(donneesAncrage(m), profil);
       principal = { type: 'ancrage', r };
       croquis = croquisAncrage(r, m.forme, m.confinement);
-      avertissements.push(...r.avertissements);
-      calculs.push(bloc({ titre: 'Ancrage (§8.4)', lignes: lignesAncrage(r), note: r.motif }));
+      avertissements.push(...r.avertissements.map(phrase));
+      calculs.push(bloc({ titre: t.blocs.ancrage, lignes: lignesAncrage(r), note: phrase(r.motif) }));
     } else {
       const r = verifierRecouvrement(donneesRecouvrement(m), profil);
       principal = { type: 'recouvrement', r };
       croquis = croquisRecouvrement(r);
-      avertissements.push(...r.ancrage.avertissements, ...(r.armatureDeCouture.requise ? [r.armatureDeCouture.repartition] : []));
+      avertissements.push(...[...r.ancrage.avertissements, ...(r.armatureDeCouture.requise ? [r.armatureDeCouture.repartition] : [])].map(phrase));
       calculs.push(
-        bloc({ titre: 'Adhérence et longueur de référence (§8.4)', lignes: lignesAncrage(r.ancrage).slice(0, 7), note: null }),
-        bloc({ titre: 'Recouvrement (§8.7)', lignes: lignesRecouvrement(r), note: r.motif })
+        bloc({ titre: t.blocs.adherence, lignes: lignesAncrage(r.ancrage).slice(0, 7), note: null }),
+        bloc({ titre: t.blocs.recouvrement, lignes: lignesRecouvrement(r), note: phrase(r.motif) })
       );
     }
   } catch (e) {
-    calculs.push(bloc({ titre: m.mode === 'ancrage' ? 'Ancrage' : 'Recouvrement', lignes: [], note: messageDErreur(e) }));
+    calculs.push(bloc({ titre: m.mode === 'ancrage' ? t.blocs.ancrageSeul : t.blocs.recouvrementSeul, lignes: [], note: messageDErreur(e) }));
   }
 
   let mandrin: VerificationMandrin | null = null;
@@ -107,11 +108,11 @@ export function noteDuCalcul(profil: ProfilEc2, m: ModeleSaisie, cartouche: { pr
   try {
     mandrin = verifierMandrin(m.phi, profil, m.phiM, null);
     cadre = verifierCadre(m.phiCadre, m.typeCadre, profil, m.retour);
-    calculs.push(bloc({ titre: 'Mandrins et cadres (§8.3, §8.5)', lignes: lignesMandrinEtCadre(mandrin, cadre), note: null }));
+    calculs.push(bloc({ titre: t.blocs.mandrins, lignes: lignesMandrinEtCadre(mandrin, cadre), note: null }));
   } catch (e) {
     mandrin = null;
     cadre = null;
-    calculs.push(bloc({ titre: 'Mandrins et cadres (§8.3, §8.5)', lignes: [], note: messageDErreur(e) }));
+    calculs.push(bloc({ titre: t.blocs.mandrins, lignes: [], note: messageDErreur(e) }));
   }
 
   calculs.push(bloc(blocSynthese(tableauParDiametre(donneesAncrage({ ...m, mode: 'ancrage' }), profil, m.rho1))));
@@ -127,29 +128,29 @@ export function noteDuCalcul(profil: ProfilEc2, m: ModeleSaisie, cartouche: { pr
     sections: {
       geometrie: [
         bloc({
-          titre: 'Barres et enrobages',
+          titre: x.barres,
           lignes: [
             phi,
             forme,
             enrobages,
-            L('l_disponible', 'longueur disponible', m.disponible === null ? 'non saisie' : `${aff(m.disponible, 0)} mm`),
-            ...(m.mode === 'recouvrement' ? [L('rho_1', 'proportion de barres recouvertes dans la section', `${aff(m.rho1, 0)} %`)] : []),
+            L('l_disponible', x.disponible, m.disponible === null ? x.nonSaisie : `${aff(m.disponible, 0)} mm`),
+            ...(m.mode === 'recouvrement' ? [L('rho_1', x.rho1, `${aff(m.rho1, 0)} %`)] : []),
           ],
           note: null,
         }),
-        ...(croquis === '' ? [] : [{ type: 'figure' as const, svg: croquis, legende: m.mode === 'ancrage' ? "Croquis de l'ancrage" : 'Croquis du recouvrement' }]),
+        ...(croquis === '' ? [] : [{ type: 'figure' as const, svg: croquis, legende: m.mode === 'ancrage' ? t.croquis.ancrage : t.croquis.recouvrement }]),
       ],
-      materiaux: [bloc({ titre: 'Matériaux', lignes: [materiaux], note: null })],
+      materiaux: [bloc({ titre: x.materiaux, lignes: [materiaux], note: null })],
       hypotheses: [
-        { type: 'texte', texte: `Profil normatif : ${profil.nom}, données consultées le ${profil.date}.` },
+        { type: 'texte', texte: x.profil(phrase(profil.nom), profil.date) },
         bloc({
-          titre: 'Objet du calcul',
-          lignes: [calcul, ...(m.mode === 'ancrage' ? [L('méthode', 'longueur équivalente', m.methode === 'simplifiee' ? 'simplifiée, §8.4.4(2)' : 'générale, expression (8.4)')] : [])],
+          titre: x.objet,
+          lignes: [calcul, ...(m.mode === 'ancrage' ? [L(x.methode, x.longueurEquivalente, m.methode === 'simplifiee' ? x.simplifiee : x.generale)] : [])],
           note: null,
         }),
-        { type: 'liste', items: HYPOTHESES_NOTE },
+        { type: 'liste', items: x.hypotheses },
       ],
-      charges: [bloc({ titre: 'Sollicitation de la barre', lignes: [L('sollicitation', 'barre', m.sollicitation), ligneContrainte(m)], note: null })],
+      charges: [bloc({ titre: x.sollicitationBarre, lignes: [L(x.sollicitation, x.barre, t.sollicitations[m.sollicitation]), ligneContrainte(m)], note: null })],
       calculs,
     },
     verifications: verificationsDeLaNote(m, principal, mandrin, cadre),
