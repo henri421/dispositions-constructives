@@ -5,6 +5,7 @@
  * a `form`, `vue`, `croquis` et `export` — tous purs — la mise en forme.
  */
 
+import { brancherFeuilles, type BarreFeuilles, type Json } from 'aedificium-ui';
 import {
   definirLangue,
   langueDuDocument,
@@ -148,7 +149,11 @@ interface Etat {
 
 let etat: Etat | null = null;
 
+/** Feuilles de calcul d'un projet de la suite : la feuille est le releve des champs. */
+let barre: BarreFeuilles | null = null;
+
 function rafraichir(): void {
+  barre?.signaler();
   const lecture = modeleDepuisChamps(valeursDesChamps());
   if (!lecture.ok) {
     montrer(zones.erreurSaisie, lecture.message);
@@ -253,6 +258,26 @@ champProjet.value = cartouche.projet;
 champElement.value = cartouche.element;
 // Hors formulaire : un changement de cartouche ne relance pas le calcul.
 sorties.addEventListener('input', enregistrerCartouche);
+barre = brancherFeuilles({
+  app: 'dispositions-constructives',
+  nomApp: exige<HTMLElement>('header h1').textContent ?? 'dispositions-constructives',
+  conteneur: exige<HTMLElement>('[data-role="feuilles"]'),
+  lire: () => valeursDesChamps() as Json,
+  charger: (d) => {
+    if (d === null) ecrireModele(modeleParDefaut());
+    else {
+      const v = d as Record<string, string>;
+      for (const el of champs()) {
+        const valeur = v[el.getAttribute('data-champ') ?? ''];
+        if (valeur === undefined) continue;
+        if (el instanceof HTMLInputElement && el.type === 'checkbox') el.checked = valeur === 'oui';
+        else el.value = valeur;
+      }
+    }
+    rafraichir();
+  },
+});
+
 rafraichir();
 
 if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
