@@ -14,6 +14,7 @@ import { croquisAncrage, croquisRecouvrement } from '../../app/src/croquis';
 import { lignesAncrage, lignesMandrinEtCadre, lignesRecouvrement } from '../../app/src/vue';
 import { HYPOTHESES_NOTE, noteDuCalcul } from '../../app/src/note';
 import { STYLES_TRACE } from '../../app/src/export';
+import { VERSION_OUTIL } from '../../app/src/version';
 
 const P = ec2Recommande();
 const lire = (chemin: string): string => readFileSync(fileURLToPath(new URL(chemin, import.meta.url)), 'utf8');
@@ -33,7 +34,7 @@ const figures = (els: ElementNote[] | undefined) => (els ?? []).flatMap((e) => (
 
 describe('cartouche', () => {
   it('projet, element, date, norme et outil', () => {
-    expect(note(DEF).cartouche).toEqual({ ...CARTOUCHE, norme: 'EN 1992-1-1:2004', outil: 'dispositions-constructives' });
+    expect(note(DEF).cartouche).toEqual({ ...CARTOUCHE, version: VERSION_OUTIL, norme: 'EN 1992-1-1:2004', outil: 'dispositions-constructives' });
   });
 
   it('element vide : objet et diametre', () => {

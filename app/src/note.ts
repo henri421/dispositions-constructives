@@ -23,6 +23,7 @@ import { donneesAncrage, donneesRecouvrement, type ModeleSaisie } from './form';
 import { croquisAncrage, croquisRecouvrement } from './croquis';
 import { blocEntrees, blocSynthese, lignesAncrage, lignesMandrinEtCadre, lignesRecouvrement, messageDErreur } from './vue';
 import { phrase, textes } from './textes';
+import { VERSION_OUTIL } from './version';
 
 /** Hypotheses et limites rappelees dans la note de calcul. */
 export const HYPOTHESES_NOTE: string[] = textes().note.hypotheses;
@@ -119,6 +120,7 @@ export function noteDuCalcul(profil: ProfilEc2, m: ModeleSaisie, cartouche: { pr
 
   return {
     cartouche: {
+      version: VERSION_OUTIL,
       projet: cartouche.projet,
       element: cartouche.element.trim() === '' ? nomDeLElement(m) : cartouche.element,
       date: cartouche.date,
