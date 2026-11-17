@@ -6,7 +6,17 @@
  * memes lignes que l'ecran et le CSV, sans dependre de l'etat de la page.
  */
 
-import { nombreAffiche, type BlocResultat, type ElementNote, type LigneResultat, type NoteDeCalcul, type VerificationNote } from 'aedificium-ui';
+import {
+  avertissementAnnexeLu,
+  libelleAnnexe,
+  nombreAffiche,
+  traduireSource,
+  type BlocResultat,
+  type ElementNote,
+  type LigneResultat,
+  type NoteDeCalcul,
+  type VerificationNote,
+} from 'aedificium-ui';
 import {
   tableauParDiametre,
   verifierAncrage,
@@ -20,6 +30,7 @@ import {
   type VerificationMandrin,
 } from '../../src/index';
 import { donneesAncrage, donneesRecouvrement, type ModeleSaisie } from './form';
+import { COEFS, SYMBOLES } from './annexe';
 import { croquisAncrage, croquisRecouvrement } from './croquis';
 import { blocEntrees, blocSynthese, lignesAncrage, lignesMandrinEtCadre, lignesRecouvrement, messageDErreur } from './vue';
 import { phrase, textes } from './textes';
@@ -79,7 +90,7 @@ export function noteDuCalcul(profil: ProfilEc2, m: ModeleSaisie, cartouche: { pr
   const x = t.note;
   const [calcul, phi, materiaux, forme, enrobages] = blocEntrees(m).lignes;
   const calculs: ElementNote[] = [];
-  const avertissements: string[] = [];
+  const avertissements: string[] = m.annexe === 'lu' ? [avertissementAnnexeLu()].filter((a) => a !== '') : [];
   let principal: Principal | null = null;
   let croquis = '';
 
@@ -145,6 +156,11 @@ export function noteDuCalcul(profil: ProfilEc2, m: ModeleSaisie, cartouche: { pr
       materiaux: [bloc({ titre: x.materiaux, lignes: [materiaux], note: null })],
       hypotheses: [
         { type: 'texte', texte: x.profil(phrase(profil.nom), profil.date) },
+        bloc({
+          titre: `${x.coefficients} : ${libelleAnnexe(m.annexe)}`,
+          lignes: COEFS.map((k) => L(SYMBOLES[k], `${x.libellesCoefs[k]} (${traduireSource(profil[k].source)})`, aff(profil[k].valeur, 4))),
+          note: null,
+        }),
         bloc({
           titre: x.objet,
           lignes: [calcul, ...(m.mode === 'ancrage' ? [L(x.methode, x.longueurEquivalente, m.methode === 'simplifiee' ? x.simplifiee : x.generale)] : [])],

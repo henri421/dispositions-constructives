@@ -5,8 +5,9 @@
  * Unites : mm, mm2, MPa, kN, degres.
  */
 
-import { langueCourante, lireNombre } from 'aedificium-ui';
+import { langueCourante, lireAnnexe, lireNombre, type AnnexeNationale } from 'aedificium-ui';
 import { textes } from './textes';
+import { COEFS, coefsDeLAnnexe, type Coefs } from './annexe';
 import type {
   DonneesAncrage,
   DonneesRecouvrement,
@@ -54,6 +55,10 @@ export interface ModeleSaisie {
   phiCadre: number;
   typeCadre: AncrageCadre;
   retour: number | null;
+  /** Annexe nationale choisie (lot E). */
+  annexe: AnnexeNationale;
+  /** Coefficients de l'annexe, preremplis et modifiables. */
+  coefs: Coefs;
 }
 
 export type Lecture = { ok: true; modele: ModeleSaisie } | { ok: false; message: string };
@@ -100,6 +105,8 @@ export function modeleParDefaut(): ModeleSaisie {
     phiCadre: 8,
     typeCadre: 'crochet',
     retour: null,
+    annexe: 'recommande',
+    coefs: coefsDeLAnnexe('recommande'),
   };
 }
 
@@ -177,6 +184,8 @@ export function modeleDepuisChamps(v: Record<string, string>): Lecture {
         phiCadre: nombre(v, 'phi_cadre', true, d.phiCadre),
         typeCadre: choix(v, 'type_cadre', ['crochet', 'coude'] as const),
         retour: nombreOuVide(v, 'retour'),
+        annexe: lireAnnexe(v['annexe']),
+        coefs: Object.fromEntries(COEFS.map((k) => [k, nombre(v, `coef_${k}`, true, d.coefs[k])])) as Coefs,
       },
     };
   } catch (e) {
@@ -225,6 +234,8 @@ export function champsDepuisModele(m: ModeleSaisie): Record<string, string> {
     phi_cadre: n(m.phiCadre),
     type_cadre: m.typeCadre,
     retour: nv(m.retour),
+    annexe: m.annexe,
+    ...Object.fromEntries(COEFS.map((k) => [`coef_${k}`, n(m.coefs[k])])),
   };
 }
 

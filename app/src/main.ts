@@ -5,7 +5,7 @@
  * a `form`, `vue`, `croquis` et `export` — tous purs — la mise en forme.
  */
 
-import { brancherFeuilles, type BarreFeuilles, type Json } from 'aedificium-ui';
+import { avertissementAnnexeLu, brancherFeuilles, lireAnnexe, optionsAnnexe, type BarreFeuilles, type Json } from 'aedificium-ui';
 import {
   definirLangue,
   langueDuDocument,
@@ -18,16 +18,17 @@ import {
   type BlocResultat,
 } from 'aedificium-ui';
 import {
-  ec2Recommande,
   tableauParDiametre,
   verifierAncrage,
   verifierCadre,
   verifierMandrin,
   verifierRecouvrement,
+  type ProfilEc2,
   type ResultatAncrage,
   type ResultatRecouvrement,
 } from '../../src/index';
 import { champsDepuisModele, donneesAncrage, donneesRecouvrement, modeleDepuisChamps, modeleParDefaut, type ModeleSaisie } from './form';
+import { coefsDeLAnnexe, profilDeCalcul } from './annexe';
 import { croquisAncrage, croquisRecouvrement } from './croquis';
 import { noteDuCalcul } from './note';
 import {
@@ -55,7 +56,6 @@ function exige<T extends Element>(selecteur: string): T {
   return trouve as T;
 }
 
-const PROFIL = ec2Recommande();
 const CLE_CARTOUCHE = 'dispositions-constructives:cartouche';
 const formulaire = exige<HTMLFormElement>('#formulaire');
 const sorties = exige<HTMLElement>('#sorties');
@@ -141,6 +141,7 @@ function montrer(el: HTMLElement, message: string | null): void {
 }
 
 interface Etat {
+  profil: ProfilEc2;
   modele: ModeleSaisie;
   resultat: { type: 'ancrage'; r: ResultatAncrage } | { type: 'recouvrement'; r: ResultatRecouvrement } | null;
   croquis: string;
@@ -162,27 +163,29 @@ function rafraichir(): void {
   montrer(zones.erreurSaisie, null);
   const m = lecture.modele;
   ajusterLesGroupes(m);
+  const profil = profilDeCalcul(m.annexe, m.coefs);
+  const avertissementsAnnexe = m.annexe === 'lu' ? [avertissementAnnexeLu()].filter((a) => a !== '') : [];
   const blocs: BlocResultat[] = [];
 
   let resultat: Etat['resultat'] = null;
   let croquis = '';
   try {
     if (m.mode === 'ancrage') {
-      const r = verifierAncrage(donneesAncrage(m), PROFIL);
+      const r = verifierAncrage(donneesAncrage(m), profil);
       resultat = { type: 'ancrage', r };
       croquis = croquisAncrage(r, m.forme, m.confinement);
       zones.verdict.innerHTML = verdictHtml(r.verdict, r.motif);
-      zones.avertissements.innerHTML = avertissementsHtml(r.avertissements);
+      zones.avertissements.innerHTML = avertissementsHtml([...avertissementsAnnexe, ...r.avertissements]);
       const lignes = lignesAncrage(r);
       zones.corps.innerHTML = tableHtml(lignes);
       blocs.push({ titre: textes().blocs.ancrage, lignes, note: null }, blocVerdict(r.verdict, r.motif));
     } else {
-      const r = verifierRecouvrement(donneesRecouvrement(m), PROFIL);
+      const r = verifierRecouvrement(donneesRecouvrement(m), profil);
       resultat = { type: 'recouvrement', r };
       croquis = croquisRecouvrement(r);
       zones.verdict.innerHTML = verdictHtml(r.verdict, r.motif);
       const couture = r.armatureDeCouture.requise ? [r.armatureDeCouture.repartition] : [];
-      zones.avertissements.innerHTML = avertissementsHtml([...r.ancrage.avertissements, ...couture]);
+      zones.avertissements.innerHTML = avertissementsHtml([...avertissementsAnnexe, ...r.ancrage.avertissements, ...couture]);
       const base = lignesAncrage(r.ancrage).slice(0, 7);
       const lignes = lignesRecouvrement(r);
       zones.corps.innerHTML = tableHtml([...base, ...lignes]);
@@ -200,8 +203,8 @@ function rafraichir(): void {
   }
 
   try {
-    const mandrin = verifierMandrin(m.phi, PROFIL, m.phiM, null);
-    const cadre = verifierCadre(m.phiCadre, m.typeCadre, PROFIL, m.retour);
+    const mandrin = verifierMandrin(m.phi, profil, m.phiM, null);
+    const cadre = verifierCadre(m.phiCadre, m.typeCadre, profil, m.retour);
     const lignes = lignesMandrinEtCadre(mandrin, cadre);
     zones.mandrins.innerHTML = tableHtml(lignes);
     blocs.push({ titre: textes().blocs.mandrins, lignes, note: null });
@@ -212,11 +215,11 @@ function rafraichir(): void {
     blocs.push({ titre: textes().blocs.mandrins, lignes: [], note: messageDErreur(e) });
   }
 
-  const synthese = tableauParDiametre(donneesAncrage({ ...m, mode: 'ancrage' }), PROFIL, m.rho1);
+  const synthese = tableauParDiametre(donneesAncrage({ ...m, mode: 'ancrage' }), profil, m.rho1);
   zones.synthese.innerHTML = syntheseHtml(synthese);
   blocs.push(blocSynthese(synthese));
 
-  etat = { modele: m, resultat, croquis, lignes: blocs };
+  etat = { profil, modele: m, resultat, croquis, lignes: blocs };
 }
 
 document.addEventListener('click', (ev) => {
@@ -239,7 +242,7 @@ document.addEventListener('click', (ev) => {
     ouvrirOuTelecharger(
       `${base}-note.html`,
       noteDeCalculHtml(
-        noteDuCalcul(PROFIL, e.modele, {
+        noteDuCalcul(e.profil, e.modele, {
           projet: champProjet.value,
           element: champElement.value,
           date: new Date().toISOString().slice(0, 10),
@@ -250,7 +253,18 @@ document.addEventListener('click', (ev) => {
   }
 });
 
+exige<HTMLSelectElement>('[data-champ="annexe"]').innerHTML = optionsAnnexe('recommande');
 ecrireModele(modeleParDefaut());
+// Changer d'annexe repremplit ses coefficients ; chacun reste modifiable ensuite.
+formulaire.addEventListener('change', (ev) => {
+  const cible = ev.target;
+  if (!(cible instanceof HTMLSelectElement) || cible.dataset.champ !== 'annexe') return;
+  const coefs = coefsDeLAnnexe(lireAnnexe(cible.value));
+  for (const [k, x] of Object.entries(coefs)) {
+    const champ = formulaire.querySelector<HTMLInputElement>(`[data-champ="coef_${k}"]`);
+    if (champ !== null) champ.value = champsDepuisModele({ ...modeleParDefaut(), coefs })[`coef_${k}`] ?? String(x);
+  }
+});
 formulaire.addEventListener('input', rafraichir);
 formulaire.addEventListener('change', rafraichir);
 const cartouche = lireCartouche();
@@ -264,8 +278,8 @@ barre = brancherFeuilles({
   conteneur: exige<HTMLElement>('[data-role="feuilles"]'),
   lire: () => valeursDesChamps() as Json,
   charger: (d) => {
-    if (d === null) ecrireModele(modeleParDefaut());
-    else {
+    ecrireModele(modeleParDefaut());
+    if (d !== null) {
       const v = d as Record<string, string>;
       for (const el of champs()) {
         const valeur = v[el.getAttribute('data-champ') ?? ''];

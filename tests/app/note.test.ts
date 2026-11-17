@@ -76,14 +76,14 @@ describe('sections', () => {
   it('materiaux, hypotheses, cas de charges', () => {
     const n = note(DEF);
     expect(symboles(n.sections.materiaux)).toEqual(['béton / acier']);
-    expect(symboles(n.sections.hypotheses)).toEqual(['calcul', 'méthode']);
+    expect(symboles(n.sections.hypotheses)).toEqual(['gamma_C', 'gamma_S', 'alpha_cc', 'alpha_ct', 'phi_m / phi (phi <= seuil)', 'phi_m / phi (phi > seuil)', 'seuil (mm)', 'calcul', 'méthode']);
     expect((n.sections.hypotheses ?? []).some((e) => e.type === 'texte' && e.texte.includes(P.nom))).toBe(true);
     expect((n.sections.hypotheses ?? []).flatMap((e) => (e.type === 'liste' ? [e.items] : []))).toEqual([HYPOTHESES_NOTE]);
     expect(symboles(n.sections.charges)).toEqual(['sollicitation', 'sigma_sd']);
   });
 
   it('recouvrement : pas de ligne de methode', () => {
-    expect(symboles(note(REC).sections.hypotheses)).toEqual(['calcul']);
+    expect(symboles(note(REC).sections.hypotheses)).toEqual(['gamma_C', 'gamma_S', 'alpha_cc', 'alpha_ct', 'phi_m / phi (phi <= seuil)', 'phi_m / phi (phi > seuil)', 'seuil (mm)', 'calcul']);
   });
 });
 

@@ -102,7 +102,7 @@ const FR = {
   },
   note: {
     hypotheses: [
-      "Valeurs recommandées de l'EN 1992-1-1 ; aucune annexe nationale codée.",
+      "Coefficients de l'annexe nationale choisie (valeurs recommandées de l'EN 1992-1-1 ou Luxembourg), modifiables : une valeur changée est marquée imposée.",
       'Borne alpha_2 alpha_3 alpha_5 >= 0,7 appliquée aux ancrages et aux recouvrements.',
       'Méthode simplifiée : l_b,eq porté à l_b,min, du côté de la sécurité.',
     ],
@@ -124,6 +124,16 @@ const FR = {
     rho1: 'proportion de barres recouvertes dans la section',
     materiaux: 'Matériaux',
     profil: (nom: string, date: string): string => `Profil normatif : ${nom}, données consultées le ${date}.`,
+    coefficients: 'Annexe nationale et coefficients',
+    libellesCoefs: {
+      gamma_C: 'coefficient partiel du béton',
+      gamma_S: 'coefficient partiel de l’acier',
+      alpha_cc: 'effets à long terme en compression',
+      alpha_ct: 'résistance moyenne à la traction',
+      mandrin_petits: 'diamètre de mandrin minimal, phi <= seuil',
+      mandrin_grands: 'diamètre de mandrin minimal, phi > seuil',
+      mandrin_seuil: 'seuil de diamètre du tableau 8.1N',
+    } as Record<string, string>,
     objet: 'Objet du calcul',
     methode: 'méthode',
     longueurEquivalente: 'longueur équivalente',
@@ -260,7 +270,7 @@ const EN: Textes = {
   },
   note: {
     hypotheses: [
-      'Recommended values of EN 1992-1-1; no National Annex coded.',
+      'Factors of the chosen National Annex (recommended values of EN 1992-1-1 or Luxembourg), editable: a changed value is marked as imposed.',
       'Limit alpha_2 alpha_3 alpha_5 >= 0.7 applied to anchorages and laps.',
       'Simplified method: l_b,eq raised to l_b,min, on the safe side.',
     ],
@@ -282,6 +292,16 @@ const EN: Textes = {
     rho1: 'proportion of lapped bars in the section',
     materiaux: 'Materials',
     profil: (nom, date) => `Code profile: ${nom}, data checked on ${date}.`,
+    coefficients: 'National Annex and factors',
+    libellesCoefs: {
+      gamma_C: 'partial factor for concrete',
+      gamma_S: 'partial factor for steel',
+      alpha_cc: 'long-term effects in compression',
+      alpha_ct: 'mean tensile strength',
+      mandrin_petits: 'minimum mandrel diameter, phi <= threshold',
+      mandrin_grands: 'minimum mandrel diameter, phi > threshold',
+      mandrin_seuil: 'diameter threshold of Table 8.1N',
+    },
     objet: 'Object of the calculation',
     methode: 'method',
     longueurEquivalente: 'equivalent length',
