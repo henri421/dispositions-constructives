@@ -165,6 +165,7 @@ const FR = {
     elementAbsent: (s: string): string => `élément absent de la page : ${s}`,
     aucunCroquis: 'Aucun croquis valide à exporter : corriger la saisie.',
     nouvelleVersion: 'Une nouvelle version est disponible. Recharger maintenant ?',
+    imposee: (valeur: string, source: string): string => `valeur imposée par l’utilisateur (profil : ${valeur}, ${source})`,
   },
 };
 
@@ -322,6 +323,7 @@ const EN: Textes = {
     elementAbsent: (s) => `element missing from the page: ${s}`,
     aucunCroquis: 'No valid sketch to export: correct the input.',
     nouvelleVersion: 'A new version is available. Reload now?',
+    imposee: (valeur, source) => `value imposed by the user (profile: ${valeur}, ${source})`,
   },
 };
 
