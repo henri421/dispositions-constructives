@@ -9,7 +9,7 @@ import { avertissementAnnexeLu, brancherFeuilles, lireAnnexe, optionsAnnexe, typ
 import {
   definirLangue,
   langueDuDocument,
-  noteDeCalculHtml,
+  noteDeCalculHtml, telechargerNotePdf,
   notationTexte,
   ouvrirOuTelecharger,
   resultatsEnCsv,
@@ -238,18 +238,16 @@ document.addEventListener('click', (ev) => {
     telecharger(`${base}.svg`, svgAutonome(e.croquis, STYLES_TRACE), 'image/svg+xml;charset=utf-8');
   } else if (action === 'exporter-resultats') {
     telecharger(`${base}.csv`, resultatsEnCsv(blocsEnTexte([blocEntrees(e.modele), ...e.lignes])), 'text/csv;charset=utf-8');
-  } else if (action === 'exporter-note') {
-    ouvrirOuTelecharger(
-      `${base}-note.html`,
-      noteDeCalculHtml(
-        noteDuCalcul(e.profil, e.modele, {
-          projet: champProjet.value,
-          element: champElement.value,
-          date: new Date().toISOString().slice(0, 10),
-        }),
-        STYLES_TRACE
-      )
-    );
+  } else if (action === 'exporter-note' || action === 'exporter-note-pdf') {
+    const pdf = action === 'exporter-note-pdf';
+    const noteCalc = noteDuCalcul(e.profil, e.modele, {
+      projet: champProjet.value,
+      element: champElement.value,
+      date: new Date().toISOString().slice(0, 10),
+    });
+    // PDF construit au clic ; en cas d'echec, la note HTML prend le relais.
+    if (pdf) void telechargerNotePdf(`${base}-note.pdf`, noteCalc, STYLES_TRACE).catch(() => ouvrirOuTelecharger(`${base}-note.html`, noteDeCalculHtml(noteCalc, STYLES_TRACE)));
+    else ouvrirOuTelecharger(`${base}-note.html`, noteDeCalculHtml(noteCalc, STYLES_TRACE));
   }
 });
 
